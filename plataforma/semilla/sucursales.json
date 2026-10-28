@@ -1,0 +1,17 @@
+[
+  {
+    "idOrigen": "sucursal-principal",
+    "slug": "principal",
+    "estado": "visible",
+    "orden": 0,
+    "datos": {
+      "nombre": "[PENDIENTE: nombre del local]",
+      "direccion": "[PENDIENTE: dirección del local]",
+      "ciudad": "[PENDIENTE: ciudad]",
+      "horario": "[PENDIENTE: horario]",
+      "telefono": "[PENDIENTE: teléfono]",
+      "mapa": null,
+      "foto": null
+    }
+  }
+]

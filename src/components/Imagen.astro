@@ -1,0 +1,54 @@
+---
+// El ÚNICO lugar donde se pinta una foto: URL pública (urlPublicaDeMedio), srcset con las variantes de la plataforma
+// (imagenResponsiva), width/height, alt y lazy salvo la principal de la página. Sin foto, un recuadro neutro.
+import { imagenResponsiva } from '@plataforma/sdk';
+import { fotoPublica } from '../lib/plataforma/medios';
+
+interface FotoEntrada {
+  src: string;
+  width: number | null;
+  height: number | null;
+  alt: string;
+  variantes?: { src: string; width: number; height: number }[];
+}
+interface Props {
+  foto: FotoEntrada | null | undefined;
+  sizes?: string;
+  prioritaria?: boolean;
+  class?: string;
+  /** Texto alternativo si la foto no trae uno. */
+  alt?: string;
+}
+const { foto, sizes, prioritaria = false, class: clase, alt } = Astro.props;
+
+const atributos = foto
+  ? imagenResponsiva(
+      { ...fotoPublica({ ...foto, variantes: foto.variantes ?? [] }), width: foto.width ?? 1200, height: foto.height ?? 1200, alt: foto.alt || alt || '' },
+      { sizes, prioritaria },
+    )
+  : null;
+---
+{
+  atributos ? (
+    <img
+      class={clase}
+      src={atributos.src}
+      srcset={atributos.srcSet}
+      sizes={atributos.sizes}
+      width={atributos.width}
+      height={atributos.height}
+      alt={atributos.alt}
+      loading={atributos.loading}
+      decoding={atributos.decoding}
+      fetchpriority={atributos.fetchPriority}
+    />
+  ) : (
+    <div class:list={['foto-pendiente', clase]} role={alt ? 'img' : undefined} aria-label={alt}>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3.5" y="5" width="17" height="14" rx="2" />
+        <circle cx="9" cy="10" r="1.6" />
+        <path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4" />
+      </svg>
+    </div>
+  )
+}

@@ -1,0 +1,18 @@
+{
+  "key": "cotizacion",
+  "label": "Cotización",
+  "active": true,
+  "fields": [
+    { "name": "nombre", "label": "Nombre", "type": "text", "required": true, "max": 100 },
+    { "name": "empresa", "label": "Empresa", "type": "text", "required": false, "max": 120 },
+    { "name": "email", "label": "Correo", "type": "email", "required": true, "max": 120 },
+    { "name": "telefono", "label": "Teléfono", "type": "phone", "required": true, "max": 30 },
+    { "name": "tipoCliente", "label": "Tipo de cliente", "type": "option", "required": true, "options": [
+      { "value": "Hogar", "label": "Hogar" },
+      { "value": "Constructora o inmobiliaria", "label": "Constructora o inmobiliaria" },
+      { "value": "Empresa u hotel", "label": "Empresa u hotel" }
+    ] },
+    { "name": "ciudad", "label": "Ciudad", "type": "text", "required": false, "max": 60 },
+    { "name": "productos", "label": "Productos que necesitas", "type": "textLong", "required": true, "max": 2000 }
+  ]
+}

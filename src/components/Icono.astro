@@ -1,0 +1,55 @@
+---
+// Íconos de línea propios (24×24, trazo 1.8). Decorativos por defecto: el texto de al lado da el significado.
+export type NombreIcono =
+  | 'envio' | 'garantia' | 'instalacion' | 'asesoria' | 'pago' | 'seguridad' | 'eficiencia'
+  | 'buscar' | 'carrito' | 'pedido' | 'whatsapp' | 'flecha' | 'menu' | 'cerrar' | 'abajo' | 'izquierda' | 'derecha'
+  | 'telefono' | 'correo' | 'ubicacion' | 'reloj' | 'tienda' | 'facebook' | 'instagram' | 'tiktok' | 'filtro';
+
+interface Props { nombre: NombreIcono; tamano?: number; class?: string; etiqueta?: string }
+const { nombre, tamano = 24, class: clase, etiqueta } = Astro.props;
+
+const trazos: Record<NombreIcono, string> = {
+  envio: '<path d="M2 6.5h11v9H2zM13 9.5h4.2l3.3 3.3v2.7H13z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
+  garantia: '<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.6 12.2l2.4 2.4 4.6-4.8"/>',
+  instalacion: '<path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3.6 17.4a1.6 1.6 0 0 0 2.3 2.3l5.9-5.9a4 4 0 0 0 5.2-5.2l-2.6 2.6-2.2-.4-.4-2.2z"/>',
+  asesoria: '<path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-5.5h4V20"/>',
+  pago: '<rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 9.5h19M6 15h4"/>',
+  seguridad: '<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M12 8.5v4.5M12 15.8v.2"/>',
+  eficiencia: '<path d="M5 19c0-8 5-13 15-14-.6 9.6-5.6 14.5-13.5 14.5"/><path d="M5 19l7-7"/>',
+  buscar: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20.5 20.5"/>',
+  carrito: '<path d="M2.5 3.5h2.6l2.3 11.2h11l2-8H6.3"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+  pedido: '<path d="M4 7.5L12 3.5l8 4v9l-8 4-8-4z"/><path d="M4 7.5l8 4 8-4M12 11.5v9"/>',
+  whatsapp: '<path d="M4.2 19.8l1-3.6A8.3 8.3 0 1 1 8 19z"/><path d="M9 8.6c.2-.6.7-.7 1-.6l.8 1.8-.7.9c.5 1.2 1.6 2.3 2.9 2.9l.9-.7 1.8.8c.1.4 0 .9-.6 1.1-1.1.5-2.6.1-4.3-1.4-1.7-1.6-2.3-3.4-1.8-4.8z"/>',
+  flecha: '<path d="M4 12h15M13 6l6 6-6 6"/>',
+  menu: '<path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/>',
+  cerrar: '<path d="M6 6l12 12M18 6L6 18"/>',
+  abajo: '<path d="M6.5 9.5l5.5 5.5 5.5-5.5"/>',
+  izquierda: '<path d="M14.5 6l-6 6 6 6"/>',
+  derecha: '<path d="M9.5 6l6 6-6 6"/>',
+  telefono: '<path d="M6.6 3.5h2.6l1.4 4-2 1.3a10.5 10.5 0 0 0 6.6 6.6l1.3-2 4 1.4v2.6a2 2 0 0 1-2.2 2C9.9 18.8 5.2 14.1 4.6 5.7a2 2 0 0 1 2-2.2z"/>',
+  correo: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+  ubicacion: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  tienda: '<path d="M4 9.5L5.5 4h13L20 9.5M4 9.5h16v10.5H4zM9.5 20v-5h5v5"/>',
+  facebook: '<path d="M14 8.5h2.5V5H14a3.5 3.5 0 0 0-3.5 3.5V11H8v3.5h2.5V21H14v-6.5h2.5L17 11h-3V9a.5.5 0 0 1 .5-.5z"/>',
+  instagram: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/>',
+  tiktok: '<path d="M14 3.5v11.2a3.3 3.3 0 1 1-3.3-3.3M14 3.5c.4 2.6 2.2 4.4 5 4.6"/>',
+  filtro: '<path d="M4 6.5h16M7 12h10M10 17.5h4"/>',
+};
+---
+<svg
+  class={clase}
+  width={tamano}
+  height={tamano}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={etiqueta ? 'img' : undefined}
+  aria-label={etiqueta}
+  aria-hidden={etiqueta ? undefined : 'true'}
+  focusable="false"
+  set:html={trazos[nombre]}
+/>

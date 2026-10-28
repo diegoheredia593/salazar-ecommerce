@@ -1,0 +1,281 @@
+---
+import { formatearPrecio, type VarianteTienda } from '@plataforma/sdk';
+import Beneficios from '../../components/Beneficios.astro';
+import FormularioPlataforma from '../../components/FormularioPlataforma.astro';
+import Icono from '../../components/Icono.astro';
+import Imagen from '../../components/Imagen.astro';
+import TarjetaProducto from '../../components/TarjetaProducto.astro';
+import Base from '../../layouts/Base.astro';
+import { contenido, ricoDe } from '../../lib/content/contenido';
+import { urlPublicaDeMedio } from '../../lib/plataforma/medios';
+import { enlaceWhatsapp } from '../../lib/sitio';
+import { leerDescripcion, marcaDe } from '../../lib/tienda/catalogo';
+import { tienda } from '../../lib/tienda/fuente';
+
+const t = await tienda();
+const producto = await t.producto(Astro.params.slug!);
+// Un borrador, un archivado o un slug que no existe: la Tienda responde null.
+if (!producto) return Astro.redirect('/tienda', 302);
+
+const c = await contenido();
+const [marcas, beneficios, preguntas, relacionados] = await Promise.all([
+  c.coleccion('marcas'),
+  c.coleccion('beneficios'),
+  c.coleccion('preguntas'),
+  producto.categoria ? t.productos({ categoria: producto.categoria.slug, porPagina: 5 }) : Promise.resolve(null),
+]);
+const marca = marcaDe(producto.nombre, marcas);
+const primera = producto.variantes.find((v) => !v.agotado) ?? producto.variantes[0]!;
+const { especificaciones, parrafos } = leerDescripcion(producto.descripcion);
+const otros = (relacionados?.productos ?? []).filter((p) => p.slug !== producto.slug).slice(0, 4);
+const deFicha = beneficios.filter((b) => b.dondeAparece.includes('ficha'));
+const preguntasFicha = preguntas.filter((p) => ['envios', 'garantia', 'instalacion'].includes(p.tema));
+const fotos = producto.fotos.length ? producto.fotos : producto.foto ? [producto.foto] : [];
+const url = new URL(Astro.url.pathname, Astro.url.origin).href;
+
+const stockDe = (v: VarianteTienda) =>
+  v.agotado ? 'Agotado' : v.disponible <= 3 ? (v.disponible === 1 ? 'Queda 1' : `Quedan ${v.disponible}`) : `Disponible · quedan ${v.disponible}`;
+const anteriorDe = (v: VarianteTienda) => v.precioAnterior ?? (v.descuento ? v.precio : null);
+const confianza = [
+  { icono: 'envio', texto: c.texto('producto.confianza.envio') },
+  { icono: 'tienda', texto: c.texto('producto.confianza.retiro') },
+  { icono: 'garantia', texto: c.texto('producto.confianza.garantia') },
+  { icono: 'pago', texto: c.texto('producto.confianza.pagos') },
+] as const;
+const mensajeWa = `${c.texto('producto.whatsapp.mensaje')} ${producto.nombre}${primera.sku ? ` (${primera.sku})` : ''}: ${url}`;
+const wa = enlaceWhatsapp(c.texto('global.contacto.whatsapp'), mensajeWa);
+
+// SEO: Product con offers en USD y disponibilidad.
+const disponibilidad = (v: VarianteTienda) => `https://schema.org/${v.agotado ? 'OutOfStock' : 'InStock'}`;
+const precioLd = (centavos: number) => (centavos / 100).toFixed(2);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: producto.nombre,
+  description: producto.descripcionCorta ?? parrafos[0] ?? undefined,
+  sku: primera.sku ?? undefined,
+  ...(marca ? { brand: { '@type': 'Brand', name: marca.nombre } } : {}),
+  ...(fotos.length ? { image: fotos.map((f) => urlPublicaDeMedio(f.src)) } : {}),
+  ...(producto.categoria ? { category: producto.categoria.nombre } : {}),
+  url,
+  offers:
+    producto.variantes.length === 1
+      ? { '@type': 'Offer', price: precioLd(primera.precioConDescuento), priceCurrency: 'USD', availability: disponibilidad(primera), url }
+      : {
+          '@type': 'AggregateOffer',
+          lowPrice: precioLd(producto.precioConDescuento.desde),
+          highPrice: precioLd(producto.precioConDescuento.hasta),
+          priceCurrency: 'USD',
+          offerCount: producto.variantes.length,
+          availability: `https://schema.org/${producto.agotado ? 'OutOfStock' : 'InStock'}`,
+        },
+};
+---
+<Base
+  titulo={producto.nombre}
+  descripcion={producto.descripcionCorta ?? `${producto.nombre}${marca ? ` · ${marca.nombre}` : ''}`}
+  imagen={producto.foto ? { ...producto.foto, width: producto.foto.width ?? 1200, height: producto.foto.height ?? 1200 } : null}
+  jsonLd={jsonLd}
+  categoriaActual={producto.categoria?.slug}
+>
+  <div class="contenedor">
+    <nav class="migas" aria-label="Estás en">
+      <ol>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/tienda">{c.texto('tienda.encabezado.titulo')}</a></li>
+        {producto.categoria && <li><a href={`/tienda?categoria=${producto.categoria.slug}`}>{producto.categoria.nombre}</a></li>}
+        <li aria-current="page">{producto.nombre}</li>
+      </ol>
+    </nav>
+
+    <article class="ficha" data-ficha>
+      <div class="galeria">
+        <ul class="galeria-fotos" aria-label="Fotos del producto">
+          {fotos.length ? fotos.map((f, i) => (
+            <li id={`foto-${i + 1}`}><Imagen foto={f} alt={producto.nombre} prioritaria={i === 0} sizes="(min-width: 1024px) 50vw, 100vw" /></li>
+          )) : <li><Imagen foto={null} alt={`${producto.nombre}: foto pendiente`} /></li>}
+        </ul>
+        {
+          fotos.length > 1 && (
+            <ul class="miniaturas">
+              {fotos.map((f, i) => (
+                <li><a href={`#foto-${i + 1}`} aria-label={`Ver foto ${i + 1}`}><Imagen foto={f} alt="" sizes="80px" /></a></li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+
+      <div class="info">
+        {marca && <a class="marca" href={`/marca/${marca.slug}`}>{marca.nombre}</a>}
+        <h1 class="nombre">{producto.nombre}</h1>
+        {primera.sku && <p class="sku">Modelo: {primera.sku}</p>}
+
+        <div class="bloque-precio">
+          {primera.descuento && <span class="etiqueta-producto en-linea">{primera.descuento.etiqueta}</span>}
+          <p class="precio-grande" aria-live="polite">
+            <span data-precio>{formatearPrecio(primera.precioConDescuento)}</span>
+            <s class="precio-tachado" data-anterior hidden={!anteriorDe(primera)}>{anteriorDe(primera) ? formatearPrecio(anteriorDe(primera)!) : ''}</s>
+          </p>
+          <p class="iva">{c.texto('global.footer.notaPrecios')}</p>
+        </div>
+        {producto.descripcionCorta && <p class="corta">{producto.descripcionCorta}</p>}
+
+        <form class="comprar" method="post" action="/api/carrito" data-carrito>
+          <input type="hidden" name="accion" value="agregar" />
+          {
+            producto.variantes.length > 1 || producto.opciones.length > 0 ? (
+              <fieldset class="variantes">
+                <legend>{producto.opciones.map((o) => o.nombre).join(' · ') || 'Presentación'}</legend>
+                {producto.variantes.map((v) => (
+                  <label class:list={['variante', { agotada: v.agotado }]}>
+                    <input
+                      type="radio" name="variante" value={v.id} checked={v.id === primera.id} disabled={v.agotado}
+                      data-precio={formatearPrecio(v.precioConDescuento)}
+                      data-anterior={anteriorDe(v) ? formatearPrecio(anteriorDe(v)!) : ''}
+                      data-stock={stockDe(v)} data-disponible={v.disponible}
+                    />
+                    <span>{v.etiqueta || producto.nombre}<small>{v.agotado ? 'Agotado' : formatearPrecio(v.precioConDescuento)}</small></span>
+                  </label>
+                ))}
+              </fieldset>
+            ) : (
+              <input type="hidden" name="variante" value={primera.id} />
+            )
+          }
+          <p class:list={['stock', { bajo: !primera.agotado && primera.disponible <= 3, agotado: primera.agotado }]} data-stock>{stockDe(primera)}</p>
+          {
+            !producto.agotado && (
+              <div class="fila-compra">
+                <div class="cantidad" data-cantidad>
+                  <button type="button" data-paso="-1" aria-label="Quitar una unidad" hidden>−</button>
+                  <label class="solo-lectores" for="cantidad">Cantidad</label>
+                  <input id="cantidad" type="number" name="cantidad" value="1" min="1" max={Math.min(99, primera.disponible)} inputmode="numeric" />
+                  <button type="button" data-paso="1" aria-label="Agregar una unidad" hidden>+</button>
+                </div>
+                <button class="boton boton-rojo agregar" type="submit"><Icono nombre="carrito" tamano={20} />Agregar al carrito</button>
+              </div>
+            )
+          }
+        </form>
+        {wa && <a class="boton boton-borde boton-ancho" href={wa} rel="noopener"><Icono nombre="whatsapp" tamano={20} />Preguntar por WhatsApp</a>}
+
+        {
+          producto.agotado && (
+            <div class="aviso-stock">
+              <p>{c.texto('producto.agotado.texto')}</p>
+              <FormularioPlataforma tipo="avisoStock" boton="Avisarme" ocultos={{ producto: `${producto.nombre}${primera.sku ? ` · ${primera.sku}` : ''}` }} exito="Listo. Te escribiremos cuando vuelva a estar disponible." />
+            </div>
+          )
+        }
+
+        <ul class="confianza">
+          {confianza.filter((x) => x.texto).map((x) => <li><Icono nombre={x.icono} tamano={22} /><span>{x.texto}</span></li>)}
+        </ul>
+        <Beneficios beneficios={deFicha} variante="ficha" />
+      </div>
+    </article>
+
+    {
+      (especificaciones.length > 0 || parrafos.length > 0) && (
+        <section class="seccion detalle" aria-labelledby="titulo-detalle">
+          <h2 id="titulo-detalle" class="titulo-seccion">Ficha técnica</h2>
+          {especificaciones.length > 0 && (
+            <dl class="especificaciones">
+              {especificaciones.map((e) => (<div><dt>{e.nombre}</dt><dd>{e.valor}</dd></div>))}
+            </dl>
+          )}
+          {parrafos.length > 0 && <div class="prosa">{parrafos.map((p) => <p>{p}</p>)}</div>}
+        </section>
+      )
+    }
+
+    {
+      preguntasFicha.length > 0 && (
+        <section class="seccion" aria-labelledby="titulo-preguntas">
+          <h2 id="titulo-preguntas" class="titulo-seccion">Preguntas frecuentes</h2>
+          <div class="preguntas">
+            {preguntasFicha.map((p) => (
+              <details><summary>{p.pregunta}</summary><div class="prosa" set:html={ricoDe(p.respuesta)} /></details>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      otros.length > 0 && (
+        <section class="seccion" aria-labelledby="titulo-relacionados">
+          <h2 id="titulo-relacionados" class="titulo-seccion">{c.texto('producto.relacionados.titulo')}</h2>
+          <ul class="grilla-productos relacionados">
+            {otros.map((p) => <li><TarjetaProducto producto={p} marca={marcaDe(p.nombre, marcas)?.nombre ?? null} /></li>)}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .ficha { display: grid; gap: 28px; }
+  @media (min-width: 1024px) { .ficha { grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: start; } }
+
+  .galeria { display: grid; gap: 12px; }
+  @media (min-width: 1024px) { .galeria { position: sticky; top: 16px; } }
+  .galeria-fotos { list-style: none; margin: 0; padding: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: var(--radio-grande); background: var(--gris-tarjeta); scrollbar-width: none; }
+  .galeria-fotos li { flex: 0 0 100%; aspect-ratio: 1; scroll-snap-align: start; padding: 24px; display: grid; place-items: center; }
+  .galeria-fotos :global(img) { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .miniaturas { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; }
+  .miniaturas a { display: block; width: 72px; height: 72px; border-radius: 8px; background: var(--gris-tarjeta); padding: 6px; border: 2px solid transparent; }
+  .miniaturas a:hover { border-color: var(--tinta); }
+  .miniaturas :global(img) { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+
+  .info { display: grid; gap: 16px; align-content: start; }
+  .marca { font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; font-size: 0.875rem; color: var(--rojo); }
+  .marca:hover { text-decoration: underline; }
+  .nombre { font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.125rem); font-weight: 800; letter-spacing: -0.015em; }
+  .sku { color: var(--gris-texto); font-size: 0.9375rem; margin-top: -8px; }
+  .bloque-precio { display: grid; gap: 4px; justify-items: start; padding-block: 8px; border-block: 1px solid var(--gris-linea); }
+  .etiqueta-producto.en-linea { position: static; }
+  .precio-grande { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .precio-grande [data-precio] { font-size: clamp(1.875rem, 1.5rem + 1.4vw, 2.5rem); font-weight: 900; letter-spacing: -0.02em; }
+  .precio-grande .precio-tachado { font-size: 1.125rem; }
+  .iva { font-size: 0.8125rem; color: var(--gris-texto); }
+  .corta { font-size: 1.0625rem; }
+
+  .comprar { display: grid; gap: 14px; }
+  .variantes { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .variantes legend { font-weight: 700; margin-bottom: 8px; }
+  .variante { position: relative; }
+  .variante input { position: absolute; opacity: 0; }
+  .variante span { display: grid; gap: 2px; padding: 10px 14px; border: 1.5px solid #c9c9c9; border-radius: 8px; cursor: pointer; font-weight: 600; min-width: 96px; }
+  .variante small { font-weight: 500; color: var(--gris-texto); }
+  .variante input:checked + span { border-color: var(--rojo); box-shadow: inset 0 0 0 1px var(--rojo); }
+  .variante input:focus-visible + span { outline: 3px solid var(--rojo); outline-offset: 2px; }
+  .variante.agotada span { opacity: 0.5; text-decoration: line-through; cursor: not-allowed; }
+  .stock { font-weight: 700; color: var(--ok); }
+  .stock.bajo { color: var(--aviso-texto); }
+  .stock.agotado { color: var(--error); }
+  .fila-compra { display: flex; gap: 10px; }
+  .cantidad { display: flex; align-items: center; border: 1.5px solid #c9c9c9; border-radius: 8px; overflow: hidden; }
+  .cantidad input { width: 56px; height: 48px; border: 0; text-align: center; font-weight: 700; -moz-appearance: textfield; }
+  .cantidad input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .cantidad button { width: 44px; height: 48px; border: 0; background: var(--gris-fondo); font-size: 1.25rem; cursor: pointer; }
+  .agregar { flex: 1; }
+  .aviso-stock { display: grid; gap: 12px; padding: 16px; background: var(--gris-fondo); border-radius: var(--radio); }
+  .confianza { list-style: none; margin: 0; padding: 16px 0 0; display: grid; gap: 12px; border-top: 1px solid var(--gris-linea); }
+  .confianza li { display: flex; gap: 12px; align-items: flex-start; font-size: 0.9375rem; }
+  .confianza :global(svg) { color: var(--rojo); flex: none; }
+
+  .detalle { display: grid; gap: 20px; }
+  .especificaciones { margin: 0; display: grid; border: 1px solid var(--gris-linea); border-radius: var(--radio); overflow: hidden; max-width: 760px; }
+  .especificaciones div { display: grid; grid-template-columns: minmax(120px, 34%) 1fr; }
+  .especificaciones div:nth-child(odd) { background: var(--gris-fondo); }
+  .especificaciones dt { font-weight: 700; padding: 12px 16px; }
+  .especificaciones dd { margin: 0; padding: 12px 16px; }
+  .preguntas { display: grid; gap: 8px; max-width: 860px; margin-top: 20px; }
+  .preguntas details { border: 1px solid var(--gris-linea); border-radius: var(--radio); padding: 0 16px; }
+  .preguntas summary { padding: 14px 0; font-weight: 700; cursor: pointer; }
+  .preguntas .prosa { padding-bottom: 16px; }
+  .relacionados { margin-top: 20px; }
+</style>

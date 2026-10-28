@@ -1,0 +1,161 @@
+---
+import { formatearPrecio, urlDePago } from '@plataforma/sdk';
+import Icono from '../components/Icono.astro';
+import Imagen from '../components/Imagen.astro';
+import Base from '../layouts/Base.astro';
+import { contenido } from '../lib/content/contenido';
+import { COOKIE_CARRITO, tomarAvisos } from '../lib/tienda/carrito';
+import { tienda } from '../lib/tienda/fuente';
+
+const c = await contenido();
+const token = Astro.cookies.get(COOKIE_CARRITO)?.value;
+const carrito = token ? await (await tienda()).verCarrito(token) : null;
+const vacio = !carrito || carrito.lineas.length === 0;
+const avisos = tomarAvisos(Astro.cookies, carrito?.avisos ?? []);
+const huboError = Astro.url.searchParams.has('error');
+// El sitio reenvía /pagar a la plataforma (middleware): el pago queda en el dominio de Salazar.
+const pago = carrito ? urlDePago(carrito.token) : '';
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+<Base titulo={c.texto('carrito.seo.titulo')} descripcion={c.texto('carrito.seo.descripcion')} seccionActual="carrito" noIndexar>
+  <div class="contenedor" data-carrito-pagina>
+    <h1 class="titulo-seccion" tabindex="-1" data-carrito-estado>{c.texto('carrito.seo.titulo')}</h1>
+
+    {huboError && <p class="mensaje mensaje-error" role="alert">No pudimos actualizar el carrito. Inténtalo de nuevo.</p>}
+    {
+      avisos.length > 0 && (
+        <ul class="avisos" role="status">
+          {avisos.map((a) => <li class="mensaje mensaje-aviso">{a}</li>)}
+        </ul>
+      )
+    }
+
+    {
+      vacio ? (
+        <div class="vacio">
+          <Icono nombre="carrito" tamano={48} />
+          <p>{c.texto('carrito.vacio.texto')}</p>
+          <a class="boton boton-rojo" href="/tienda">Ver la tienda<Icono nombre="flecha" tamano={20} /></a>
+        </div>
+      ) : (
+        <div class="disposicion">
+          <ul class="lineas">
+            {carrito!.lineas.map((l) => (
+              <li class="linea">
+                <a class="linea-foto" href={`/tienda/${l.producto.slug}`} tabindex="-1" aria-hidden="true">
+                  <Imagen foto={l.foto} alt="" sizes="96px" />
+                </a>
+                <div class="linea-info">
+                  <a class="linea-nombre" href={`/tienda/${l.producto.slug}`}>{l.producto.nombre}</a>
+                  {l.etiqueta && <p class="linea-etiqueta">{l.etiqueta}</p>}
+                  <p class="linea-unitario">{formatearPrecio(l.precioUnitario)} c/u</p>
+                </div>
+                <form class="linea-cantidad" method="post" action="/api/carrito" data-carrito>
+                  <input type="hidden" name="variante" value={l.variante} />
+                  <div class="cantidad" data-cantidad>
+                    <button type="button" data-paso="-1" aria-label={`Quitar una unidad de ${l.producto.nombre}`} hidden>−</button>
+                    <label class="solo-lectores" for={`cantidad-${l.variante}`}>Cantidad de {l.producto.nombre}</label>
+                    <input id={`cantidad-${l.variante}`} type="number" name="cantidad" value={l.cantidad} min="0" max={Math.min(99, l.disponible)} inputmode="numeric" />
+                    <button type="button" data-paso="1" aria-label={`Agregar una unidad de ${l.producto.nombre}`} hidden>+</button>
+                  </div>
+                  <button class="enlace" name="accion" value="cantidad">Actualizar</button>
+                  <button class="enlace quitar" name="accion" value="quitar">Quitar<span class="solo-lectores"> {l.producto.nombre}</span></button>
+                </form>
+                <p class="linea-total">
+                  {l.descuento > 0 && <s class="precio-tachado">{formatearPrecio(l.subtotal)}</s>}
+                  <strong>{formatearPrecio(l.total)}</strong>
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <aside class="resumen" aria-labelledby="titulo-resumen">
+            <h2 id="titulo-resumen">Resumen</h2>
+            <form class="codigo" method="post" action="/api/carrito" data-carrito>
+              <label for="codigo">Código de descuento</label>
+              <div class="codigo-fila">
+                <input id="codigo" class="entrada" name="codigo" value={carrito!.codigo?.codigo ?? ''} autocomplete="off" />
+                <button class="boton boton-negro boton-chico" name="accion" value="codigo">Aplicar</button>
+              </div>
+              {
+                carrito!.codigo && (
+                  <p class="codigo-aplicado">
+                    <span>{carrito!.codigo.codigo} · {carrito!.codigo.etiqueta}{carrito!.codigo.aplicado ? '' : ' (no aplicado)'}</span>
+                    <button class="enlace" name="accion" value="sin-codigo">Quitar código</button>
+                  </p>
+                )
+              }
+            </form>
+            <dl class="totales">
+              <div><dt>Subtotal</dt><dd>{formatearPrecio(carrito!.totales.subtotal)}</dd></div>
+              {carrito!.totales.descuentoAutomatico > 0 && <div class="descuento"><dt>Descuentos</dt><dd>−{formatearPrecio(carrito!.totales.descuentoAutomatico)}</dd></div>}
+              {carrito!.totales.descuentoCodigo > 0 && <div class="descuento"><dt>{carrito!.codigo?.codigo}</dt><dd>−{formatearPrecio(carrito!.totales.descuentoCodigo)}</dd></div>}
+              <div><dt>Envío</dt><dd class="envio">Se calcula en el pago</dd></div>
+              <div class="total"><dt>Total</dt><dd>{formatearPrecio(carrito!.totales.total)}</dd></div>
+            </dl>
+            <p class="nota">{c.texto('carrito.envio.texto')}</p>
+            <a class="boton boton-rojo boton-ancho" href={pago}>Ir a pagar · {formatearPrecio(carrito!.totales.total)}<Icono nombre="flecha" tamano={20} /></a>
+            <a class="seguir" href="/tienda">Seguir comprando</a>
+            <p class="nota">{c.texto('global.footer.notaPrecios')}</p>
+          </aside>
+        </div>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  h1 { margin: 28px 0 20px; }
+  h1:focus { outline: none; }
+  .avisos { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 8px; }
+  .vacio { display: grid; justify-items: center; gap: 16px; padding: 56px 16px; background: var(--gris-fondo); border-radius: var(--radio); text-align: center; color: var(--gris-texto); }
+  .vacio p { color: var(--tinta); font-size: 1.0625rem; }
+  .disposicion { display: grid; gap: 28px; }
+  @media (min-width: 1024px) { .disposicion { grid-template-columns: 1fr 380px; align-items: start; gap: 40px; } }
+  .lineas { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--gris-linea); }
+  .linea { display: grid; grid-template-columns: 80px 1fr; gap: 12px 16px; padding: 18px 0; border-bottom: 1px solid var(--gris-linea); align-items: center; }
+  @media (min-width: 768px) { .linea { grid-template-columns: 96px 1fr auto auto; } }
+  .linea-foto { width: 80px; height: 80px; border-radius: 8px; background: var(--gris-tarjeta); padding: 6px; display: block; grid-row: span 2; }
+  @media (min-width: 768px) { .linea-foto { width: 96px; height: 96px; grid-row: auto; } }
+  .linea-foto :global(img) { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .linea-nombre { font-weight: 700; text-decoration: none; }
+  .linea-nombre:hover { text-decoration: underline; }
+  .linea-etiqueta, .linea-unitario { color: var(--gris-texto); font-size: 0.875rem; }
+  .linea-cantidad { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .linea-total { display: grid; justify-items: end; font-size: 1.0625rem; }
+  @media (max-width: 767px) { .linea-total { grid-column: 2; justify-items: start; } }
+  .cantidad { display: flex; align-items: center; border: 1.5px solid #c9c9c9; border-radius: 8px; overflow: hidden; }
+  .cantidad input { width: 52px; height: 42px; border: 0; text-align: center; font-weight: 700; -moz-appearance: textfield; }
+  .cantidad input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .cantidad button { width: 40px; height: 42px; border: 0; background: var(--gris-fondo); font-size: 1.125rem; cursor: pointer; }
+  .enlace { border: 0; background: none; padding: 8px 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: 0.875rem; font-weight: 600; }
+  .quitar { color: var(--error); }
+  :global(.js) .linea-cantidad .enlace[value='cantidad'] { display: none; }
+
+  .resumen { display: grid; gap: 16px; padding: 20px; border: 1px solid var(--gris-linea); border-radius: var(--radio-grande); }
+  @media (min-width: 1024px) { .resumen { position: sticky; top: 16px; } }
+  .resumen h2 { font-size: 1.25rem; font-weight: 800; }
+  .codigo { display: grid; gap: 8px; }
+  .codigo label { font-weight: 600; font-size: 0.9375rem; }
+  .codigo-fila { display: flex; gap: 8px; }
+  .codigo-aplicado { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; color: var(--ok); }
+  .totales { margin: 0; display: grid; gap: 10px; }
+  .totales div { display: flex; justify-content: space-between; gap: 12px; }
+  .totales dd { margin: 0; font-weight: 600; }
+  .totales .descuento { color: var(--ok); }
+  .totales .envio { color: var(--gris-texto); font-weight: 500; }
+  .totales .total { padding-top: 12px; border-top: 1px solid var(--gris-linea); font-size: 1.25rem; font-weight: 800; }
+  .totales .total dd { font-weight: 900; }
+  .nota { font-size: 0.875rem; color: var(--gris-texto); }
+  .seguir { text-align: center; font-weight: 600; }
+</style>
+
+<script>
+  // Con JavaScript, cambiar la cantidad actualiza el carrito sin botón «Actualizar».
+  document.addEventListener('change', (e) => {
+    const input = e.target as HTMLInputElement;
+    const form = input.closest<HTMLFormElement>('.linea-cantidad');
+    if (!form || input.name !== 'cantidad') return;
+    form.querySelector<HTMLButtonElement>('button[value="cantidad"]')?.click();
+  });
+</script>

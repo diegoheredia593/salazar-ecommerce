@@ -1,0 +1,82 @@
+---
+import Filtros from '../../components/Filtros.astro';
+import Paginacion from '../../components/Paginacion.astro';
+import TarjetaProducto from '../../components/TarjetaProducto.astro';
+import Base from '../../layouts/Base.astro';
+import { contenido } from '../../lib/content/contenido';
+import { categoriasTienda, filtrar, filtrosDeUrl, marcaDe, todosLosProductos } from '../../lib/tienda/catalogo';
+import { tienda } from '../../lib/tienda/fuente';
+
+const POR_PAGINA = 24;
+const c = await contenido();
+const t = await tienda();
+const filtros = filtrosDeUrl(Astro.url);
+const pagina = Math.max(1, Number(Astro.url.searchParams.get('pagina')) || 1);
+const [categorias, marcas, catalogo] = await Promise.all([categoriasTienda(t), c.coleccion('marcas'), todosLosProductos(t)]);
+const categoria = categorias.find((x) => x.slug === filtros.categoria);
+
+// Sin filtros propios del sitio: la página tal cual la entrega la Tienda (precios y stock al día, sin caché).
+// Con marca, precio, oferta u orden: el catálogo completo filtrado en el servidor (ver REPORTE-PLATAFORMA.md).
+const conFiltrosDelSitio = Boolean(filtros.marca || filtros.min !== undefined || filtros.max !== undefined || filtros.oferta || filtros.orden);
+let productos;
+let total;
+if (conFiltrosDelSitio) {
+  const lista = filtrar(catalogo, filtros, marcas);
+  total = lista.length;
+  productos = lista.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
+} else {
+  const r = await t.productos({ categoria: filtros.categoria, pagina, porPagina: POR_PAGINA });
+  ({ productos, total } = r);
+}
+
+const deCategoria = catalogo.filter((p) => !filtros.categoria || p.categoria?.slug === filtros.categoria);
+const marcasDisponibles = marcas.filter((m) => deCategoria.some((p) => marcaDe(p.nombre, marcas)?.slug === m.slug));
+const titulo = categoria?.nombre ?? c.texto('tienda.encabezado.titulo');
+---
+<Base
+  titulo={categoria ? categoria.nombre : c.texto('tienda.seo.titulo')}
+  descripcion={c.texto('tienda.seo.descripcion')}
+  categoriaActual={filtros.categoria}
+  noIndexar={conFiltrosDelSitio || pagina > 1}
+>
+  <div class="contenedor">
+    <nav class="migas" aria-label="Estás en">
+      <ol>
+        <li><a href="/">Inicio</a></li>
+        {categoria ? (<><li><a href="/tienda">{c.texto('tienda.encabezado.titulo')}</a></li><li aria-current="page">{categoria.nombre}</li></>) : <li aria-current="page">{titulo}</li>}
+      </ol>
+    </nav>
+    <header class="cabecera">
+      <h1 class="titulo-seccion">{titulo}</h1>
+      {c.texto('tienda.encabezado.texto') && <p class="subtitulo-seccion">{c.texto('tienda.encabezado.texto')}</p>}
+    </header>
+
+    <div class="disposicion">
+      <aside aria-label="Filtros">
+        <Filtros accion="/tienda" filtros={filtros} categorias={categorias.filter((x) => !x.padre)} marcas={marcasDisponibles} />
+      </aside>
+      <section aria-labelledby="resultados">
+        <p id="resultados" class="cantidad" role="status">{total === 1 ? '1 producto' : `${total} productos`}</p>
+        {
+          productos.length > 0 ? (
+            <ul class="grilla-productos">
+              {productos.map((p) => <li><TarjetaProducto producto={p} marca={marcaDe(p.nombre, marcas)?.nombre ?? null} /></li>)}
+            </ul>
+          ) : (
+            <p class="vacio">{c.texto('tienda.vacio.texto')}</p>
+          )
+        }
+        <Paginacion pagina={pagina} total={total} porPagina={POR_PAGINA} />
+        <p class="nota-iva">{c.texto('global.footer.notaPrecios')}</p>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .cabecera { margin-bottom: 24px; }
+  .disposicion { display: grid; gap: 20px; }
+  @media (min-width: 1024px) { .disposicion { grid-template-columns: 240px 1fr; gap: 40px; align-items: start; } aside { position: sticky; top: 16px; } }
+  .cantidad { color: var(--gris-texto); font-size: 0.9375rem; margin-bottom: 12px; }
+  .vacio { padding: 48px 16px; text-align: center; background: var(--gris-fondo); border-radius: var(--radio); }
+</style>

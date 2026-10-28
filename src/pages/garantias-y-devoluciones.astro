@@ -1,0 +1,40 @@
+---
+import PaginaLegal from '../components/PaginaLegal.astro';
+import { contenido, ricoDe } from '../lib/content/contenido';
+
+const c = await contenido();
+const preguntas = await c.coleccion('preguntas');
+const TEMAS = { envios: 'Envíos', pagos: 'Pagos', garantia: 'Garantía', instalacion: 'Instalación' } as const;
+const temas = (Object.keys(TEMAS) as (keyof typeof TEMAS)[]).filter((t) => preguntas.some((p) => p.tema === t));
+---
+<PaginaLegal
+  titulo={c.texto('garantias.contenido.titulo')}
+  html={c.rico('garantias.contenido.texto')}
+  seoTitulo={c.texto('garantias.seo.titulo')}
+  seoDescripcion={c.texto('garantias.seo.descripcion')}
+>
+  {
+    preguntas.length > 0 && (
+      <section class="preguntas" aria-labelledby="titulo-preguntas">
+        <h2 id="titulo-preguntas" class="titulo-seccion">{c.texto('garantias.preguntas.titulo')}</h2>
+        {temas.map((t) => (
+          <div class="tema">
+            <h3>{TEMAS[t]}</h3>
+            {preguntas.filter((p) => p.tema === t).map((p) => (
+              <details><summary>{p.pregunta}</summary><div class="prosa" set:html={ricoDe(p.respuesta)} /></details>
+            ))}
+          </div>
+        ))}
+      </section>
+    )
+  }
+</PaginaLegal>
+
+<style>
+  .preguntas { margin-top: 48px; display: grid; gap: 24px; max-width: 860px; }
+  .tema { display: grid; gap: 8px; }
+  h3 { font-size: 1.125rem; font-weight: 800; }
+  details { border: 1px solid var(--gris-linea); border-radius: var(--radio); padding: 0 16px; }
+  summary { padding: 14px 0; font-weight: 700; cursor: pointer; }
+  details .prosa { padding-bottom: 16px; }
+</style>

@@ -1,0 +1,44 @@
+---
+// Tarjeta de producto: la misma en portada, tienda, marca, promociones y búsqueda. Sin estrellas ni favoritos (no hay
+// reseñas reales). El botón manda el slug: /api/carrito resuelve la variante (ProductoResumen no trae su id).
+import { formatearPrecio, type ProductoResumen } from '@plataforma/sdk';
+import { precioDeTarjeta } from '../lib/tienda/catalogo';
+import Icono from './Icono.astro';
+import Imagen from './Imagen.astro';
+
+interface Props { producto: ProductoResumen; marca: string | null; class?: string }
+const { producto: p, marca, class: clase } = Astro.props;
+const precio = precioDeTarjeta(p);
+const etiqueta = p.agotado ? null : (p.descuento?.etiqueta ?? (p.precioAnterior ? 'Oferta' : null));
+---
+<article class:list={['tarjeta', { agotada: p.agotado }, clase]} data-categoria={p.categoria?.slug}>
+  {p.agotado && <span class="etiqueta-producto agotado">Agotado</span>}
+  {etiqueta && <span class="etiqueta-producto">{etiqueta}</span>}
+  <div class="tarjeta-foto">
+    <Imagen foto={p.foto} alt={p.nombre} sizes="(min-width: 1100px) 22vw, (min-width: 768px) 30vw, 46vw" />
+  </div>
+  <div class="tarjeta-cuerpo">
+    {marca && <p class="tarjeta-marca">{marca}</p>}
+    <h3 class="tarjeta-nombre"><a href={`/tienda/${p.slug}`}>{p.nombre}</a></h3>
+    <p class="tarjeta-precio">
+      {precio.desde && <span class="precio-desde">Desde</span>}
+      {precio.tachado && <s class="precio-tachado"><span class="solo-lectores">Antes </span>{formatearPrecio(precio.tachado)}</s>}
+      <span class="precio">{formatearPrecio(precio.actual)}</span>
+    </p>
+    <form class="tarjeta-accion" method="post" action="/api/carrito" data-carrito>
+      <input type="hidden" name="accion" value="agregar" />
+      <input type="hidden" name="producto" value={p.slug} />
+      <input type="hidden" name="cantidad" value="1" />
+      {
+        p.agotado ? (
+          <a class="boton boton-borde" href={`/tienda/${p.slug}`}>Ver producto</a>
+        ) : (
+          <button class="boton boton-rojo" type="submit">
+            <Icono nombre="carrito" tamano={18} />
+            Agregar al carrito
+          </button>
+        )
+      }
+    </form>
+  </div>
+</article>

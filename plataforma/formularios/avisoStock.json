@@ -1,0 +1,9 @@
+{
+  "key": "avisoStock",
+  "label": "Aviso de stock",
+  "active": true,
+  "fields": [
+    { "name": "email", "label": "Correo", "type": "email", "required": true, "max": 120 },
+    { "name": "producto", "label": "Producto", "type": "text", "required": true, "max": 200 }
+  ]
+}

@@ -1,0 +1,19 @@
+---
+// Las tres páginas legales (D2): cada una con su ruta, su texto enriquecido y su SEO.
+import Base from '../layouts/Base.astro';
+
+interface Props { titulo: string; html: string; seoTitulo: string; seoDescripcion: string }
+const { titulo, html, seoTitulo, seoDescripcion } = Astro.props;
+---
+<Base titulo={seoTitulo} descripcion={seoDescripcion}>
+  <div class="contenedor">
+    <nav class="migas" aria-label="Estás en"><ol><li><a href="/">Inicio</a></li><li aria-current="page">{titulo}</li></ol></nav>
+    <h1 class="titulo-seccion">{titulo}</h1>
+    <div class="prosa texto" set:html={html} />
+    <slot />
+  </div>
+</Base>
+
+<style>
+  .texto { margin-top: 24px; }
+</style>

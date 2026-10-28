@@ -1,0 +1,26 @@
+---
+import Icono from '../components/Icono.astro';
+import Base from '../layouts/Base.astro';
+
+Astro.response.status = 404;
+---
+<Base titulo="Página no encontrada" noIndexar>
+  <div class="contenedor no-encontrada">
+    <p class="codigo" aria-hidden="true">404</p>
+    <h1 class="titulo-seccion">No encontramos esta página</h1>
+    <p>Puede que el enlace esté mal escrito o que el producto ya no esté disponible.</p>
+    <form action="/buscar" method="get" role="search" class="buscar">
+      <label class="solo-lectores" for="buscar-404">Buscar productos</label>
+      <input id="buscar-404" class="entrada" type="search" name="q" placeholder="¿Qué producto estás buscando?" />
+      <button class="boton boton-rojo" type="submit"><Icono nombre="buscar" tamano={20} />Buscar</button>
+    </form>
+    <a class="enlace-flecha" href="/">Volver al inicio<Icono nombre="flecha" tamano={18} /></a>
+  </div>
+</Base>
+
+<style>
+  .no-encontrada { display: grid; gap: 16px; justify-items: center; text-align: center; padding-block: 64px 24px; }
+  .codigo { font-size: clamp(4rem, 3rem + 6vw, 7rem); font-weight: 900; color: var(--rojo); line-height: 1; }
+  .buscar { display: flex; gap: 8px; width: 100%; max-width: 520px; margin-top: 8px; }
+  .buscar .entrada { flex: 1; }
+</style>

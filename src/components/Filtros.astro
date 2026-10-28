@@ -1,0 +1,89 @@
+---
+// Filtros de la tienda: un formulario GET (funciona sin JavaScript). En móvil va dentro de un panel «Filtrar».
+import type { CategoriaTienda } from '@plataforma/sdk';
+import type { Filtros } from '../lib/tienda/catalogo';
+import Icono from './Icono.astro';
+
+interface Props {
+  accion: string;
+  filtros: Filtros;
+  categorias?: CategoriaTienda[];
+  marcas: { slug: string; nombre: string }[];
+  /** Filtros que se fijan por la página (p. ej. la marca en /marca/<slug>) y no se muestran. */
+  ocultos?: Record<string, string>;
+}
+const { accion, filtros, categorias = [], marcas, ocultos = {} } = Astro.props;
+const dolares = (c: number | undefined) => (c === undefined ? '' : String(c / 100));
+---
+<details class="filtros" open>
+  <summary><Icono nombre="filtro" tamano={20} />Filtrar</summary>
+  <form method="get" action={accion}>
+    {Object.entries(ocultos).map(([k, v]) => <input type="hidden" name={k} value={v} />)}
+    {
+      categorias.length > 0 && (
+        <fieldset>
+          <legend>Categoría</legend>
+          <label><input type="radio" name="categoria" value="" checked={!filtros.categoria} /> Todas</label>
+          {categorias.map((c) => (
+            <label><input type="radio" name="categoria" value={c.slug} checked={filtros.categoria === c.slug} /> {c.nombre}</label>
+          ))}
+        </fieldset>
+      )
+    }
+    {
+      marcas.length > 0 && (
+        <fieldset>
+          <legend>Marca</legend>
+          <label><input type="radio" name="marca" value="" checked={!filtros.marca} /> Todas</label>
+          {marcas.map((m) => (
+            <label><input type="radio" name="marca" value={m.slug} checked={filtros.marca === m.slug} /> {m.nombre}</label>
+          ))}
+        </fieldset>
+      )
+    }
+    <fieldset>
+      <legend>Precio (USD)</legend>
+      <div class="precios">
+        <label><span class="solo-lectores">Desde</span><input class="entrada" type="number" name="min" min="0" step="1" inputmode="numeric" placeholder="Desde" value={dolares(filtros.min)} /></label>
+        <label><span class="solo-lectores">Hasta</span><input class="entrada" type="number" name="max" min="0" step="1" inputmode="numeric" placeholder="Hasta" value={dolares(filtros.max)} /></label>
+      </div>
+    </fieldset>
+    <label class="casilla"><input type="checkbox" name="oferta" value="1" checked={filtros.oferta} /> Solo en oferta</label>
+    <label class="campo">
+      <span class="etiqueta">Ordenar por</span>
+      <select class="entrada" name="orden">
+        <option value="destacados" selected={!filtros.orden || filtros.orden === 'destacados'}>Destacados</option>
+        <option value="menor" selected={filtros.orden === 'menor'}>Menor precio</option>
+        <option value="mayor" selected={filtros.orden === 'mayor'}>Mayor precio</option>
+      </select>
+    </label>
+    <div class="botones">
+      <button class="boton boton-negro boton-chico" type="submit">Aplicar</button>
+      <a class="boton boton-borde boton-chico" href={accion + (ocultos.categoria ? `?categoria=${ocultos.categoria}` : '')}>Limpiar</a>
+    </div>
+  </form>
+</details>
+
+<style>
+  .filtros { border: 1px solid var(--gris-linea); border-radius: var(--radio); background: var(--blanco); }
+  summary { display: flex; align-items: center; gap: 8px; padding: 12px 16px; font-weight: 700; cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  @media (min-width: 1024px) {
+    .filtros { border: 0; }
+    summary { pointer-events: none; padding: 0 0 12px; font-size: 1.0625rem; }
+  }
+  form { display: grid; gap: 20px; padding: 4px 16px 16px; }
+  @media (min-width: 1024px) { form { padding: 0; } }
+  fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
+  legend { font-weight: 700; margin-bottom: 8px; font-size: 0.9375rem; }
+  fieldset label, .casilla { display: flex; align-items: center; gap: 10px; font-size: 0.9375rem; min-height: 32px; cursor: pointer; }
+  input[type='radio'], input[type='checkbox'] { width: 18px; height: 18px; accent-color: var(--rojo); margin: 0; }
+  .precios { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .botones { display: flex; gap: 8px; }
+</style>
+
+<script>
+  // En móvil el panel empieza cerrado; en escritorio siempre abierto (sin JavaScript queda abierto en los dos).
+  const panel = document.querySelector<HTMLDetailsElement>('details.filtros');
+  if (panel && window.matchMedia('(max-width: 1023px)').matches) panel.open = false;
+</script>

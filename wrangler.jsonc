@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "salazar-home-web",
+  "account_id": "84ffa5d2db10e557297317693d5ae3bf",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "binding": "ASSETS", "directory": "./dist" },
+  // Producción habla con la plataforma por service binding, nunca por workers.dev (error 1042).
+  // [PENDIENTE: confirmar el nombre real del Worker antes del primer despliegue]
+  "services": [{ "binding": "PLATAFORMA", "service": "agencia-plataforma" }],
+  "vars": {
+    // Vacío = Turnstile desactivado. El secreto TURNSTILE_SECRET va con `wrangler secret put`.
+    "TURNSTILE_SITE_KEY": "",
+  },
+  "observability": { "enabled": true },
+  // "routes": [{ "pattern": "[PENDIENTE: dominio]", "custom_domain": true }],
+}

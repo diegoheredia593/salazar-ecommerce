@@ -1,0 +1,27 @@
+{
+  "_nota": "Solo para `astro dev` sin llave (FUENTE=semilla). Nombres, modelos y precios salen de Salazar-Home-catalogo-precios.xlsx (PVP sugerido con IVA, en centavos). Stock, destacado, descuento y agotado son valores de prueba para ver la interfaz: no son datos de Salazar y nunca se cargan en la Tienda.",
+  "categorias": [
+    { "slug": "refrigeracion", "nombre": "Refrigeración" },
+    { "slug": "lavado-y-secado", "nombre": "Lavado y Secado" },
+    { "slug": "coccion", "nombre": "Cocción" },
+    { "slug": "microondas", "nombre": "Microondas" },
+    { "slug": "lavavajillas", "nombre": "Lavavajillas" },
+    { "slug": "climatizacion", "nombre": "Climatización" },
+    { "slug": "pequenos-electrodomesticos", "nombre": "Pequeños Electrodomésticos" }
+  ],
+  "productos": [
+    { "slug": "refrigeradora-french-door-samsung-495-l", "nombre": "Refrigeradora French Door Samsung 495 L", "sku": "RF18A5104SR/ED", "categoria": "refrigeracion", "detalle": "495 L, inox", "precio": 144999, "stock": 4, "destacado": true, "descuentoPorcentaje": 10 },
+    { "slug": "refrigeradora-mabe-331-l", "nombre": "Refrigeradora Mabe 331 L", "sku": "RMN334PAERX0", "categoria": "refrigeracion", "detalle": "331 L", "precio": 47500, "stock": 0, "destacado": false },
+    { "slug": "lavadora-carga-frontal-lg-25-kg", "nombre": "Lavadora carga frontal LG 25 kg", "sku": "WM25MV2S6W", "categoria": "lavado-y-secado", "detalle": "25 kg, Inverter Direct Drive", "precio": 92500, "stock": 3, "destacado": true },
+    { "slug": "cocina-a-gas-indurama-dublin-4-quemadores", "nombre": "Cocina a gas Indurama Dublin 4 quemadores", "sku": "Dublin Spazio Plus", "categoria": "coccion", "detalle": "4 quemadores", "precio": 13500, "stock": 12, "destacado": true },
+    { "slug": "microondas-lg-42-l", "nombre": "Microondas LG 42 L", "sku": "MS1536GIR", "categoria": "microondas", "detalle": "42 L", "precio": 19501, "stock": 8, "destacado": true },
+    { "slug": "lavavajillas-indurama-14-servicios-croma", "nombre": "Lavavajillas Indurama 14 servicios croma", "sku": "LVI-14CR", "categoria": "lavavajillas", "detalle": "14 servicios", "precio": 53500, "stock": 6, "destacado": false },
+    { "slug": "aire-acondicionado-lg-dual-inverter-12-000-btu-wi-fi", "nombre": "Aire acondicionado LG Dual Inverter 12.000 BTU Wi-Fi", "sku": "VM122C31", "categoria": "climatizacion", "detalle": "12.000 BTU", "precio": 51002, "stock": 10, "destacado": true },
+    { "slug": "freidora-de-aire-ninja-4-7-l", "nombre": "Freidora de aire Ninja 4,7 L", "sku": "AF141LAA", "categoria": "pequenos-electrodomesticos", "detalle": "4,7 L, 1750 W", "precio": 18500, "stock": 15, "destacado": true },
+    { "slug": "licuadora-oster-1-5-l", "nombre": "Licuadora Oster 1,5 L", "sku": "BLSTKAG-BRD-013", "categoria": "pequenos-electrodomesticos", "detalle": "1,5 L", "precio": 5500, "stock": 20, "destacado": false },
+    { "slug": "aspiradora-inalambrica-electrolux", "nombre": "Aspiradora inalámbrica Electrolux", "sku": "ERG36", "categoria": "pequenos-electrodomesticos", "detalle": "120 W", "precio": 25500, "stock": 5, "destacado": false }
+  ],
+  "codigos": [
+    { "codigo": "PRUEBA10", "porcentaje": 10, "compraMinima": 50000 }
+  ]
+}

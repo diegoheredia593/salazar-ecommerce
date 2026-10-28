@@ -1,0 +1,17 @@
+[
+  {
+    "idOrigen": "banner-linea-blanca",
+    "slug": "linea-blanca",
+    "estado": "visible",
+    "orden": 0,
+    "datos": {
+      "antetitulo": "Línea blanca",
+      "titulo": "Tu hogar merece lo mejor",
+      "texto": "Las mejores marcas, tecnología, eficiencia y garantía en un solo lugar.",
+      "botonTexto": "Ver productos",
+      "botonEnlace": "/tienda",
+      "foto": null,
+      "fotoMovil": null
+    }
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "key": "preguntas",
+  "label": "Preguntas frecuentes",
+  "singular": "pregunta",
+  "gender": "f",
+  "description": "Se ven en Garantías y devoluciones y, por tema, en la ficha de producto.",
+  "titleField": "pregunta",
+  "searchFields": ["pregunta"],
+  "sortBy": "order",
+  "fields": [
+    { "name": "pregunta", "label": "Pregunta", "control": "text", "required": true, "max": 120 },
+    { "name": "respuesta", "label": "Respuesta", "control": "rich", "required": true },
+    { "name": "tema", "label": "Tema", "control": "option", "required": true, "options": [
+      { "value": "envios", "label": "Envíos" },
+      { "value": "pagos", "label": "Pagos" },
+      { "value": "garantia", "label": "Garantía" },
+      { "value": "instalacion", "label": "Instalación" }
+    ] }
+  ]
+}

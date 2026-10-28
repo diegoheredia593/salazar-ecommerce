@@ -1,0 +1,11 @@
+{
+  "key": "contacto",
+  "label": "Contacto",
+  "active": true,
+  "fields": [
+    { "name": "nombre", "label": "Nombre", "type": "text", "required": true, "max": 100 },
+    { "name": "email", "label": "Correo", "type": "email", "required": true, "max": 120 },
+    { "name": "telefono", "label": "Teléfono", "type": "phone", "required": false, "max": 30 },
+    { "name": "mensaje", "label": "Mensaje", "type": "textLong", "required": true, "max": 2000 }
+  ]
+}

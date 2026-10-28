@@ -1,0 +1,9 @@
+[
+  { "idOrigen": "beneficio-envio", "slug": "envio", "estado": "visible", "orden": 0, "datos": { "titulo": "Envío a todo el país", "detalle": "Seguro y confiable", "icono": "envio", "dondeAparece": ["bajoBanner", "ficha"] } },
+  { "idOrigen": "beneficio-garantia", "slug": "garantia", "estado": "visible", "orden": 1, "datos": { "titulo": "Garantía de fábrica", "detalle": "[PENDIENTE: detalle de la garantía]", "icono": "garantia", "dondeAparece": ["bajoBanner", "ficha"] } },
+  { "idOrigen": "beneficio-instalacion", "slug": "instalacion", "estado": "visible", "orden": 2, "datos": { "titulo": "Instalación disponible", "detalle": "[PENDIENTE: detalle de la instalación]", "icono": "instalacion", "dondeAparece": ["bajoBanner"] } },
+  { "idOrigen": "beneficio-asesoria", "slug": "asesoria", "estado": "visible", "orden": 3, "datos": { "titulo": "Asesoría personalizada", "detalle": "Te ayudamos a elegir", "icono": "asesoria", "dondeAparece": ["franja"] } },
+  { "idOrigen": "beneficio-pagos", "slug": "pagos", "estado": "visible", "orden": 4, "datos": { "titulo": "Múltiples formas de pago", "detalle": "[PENDIENTE: formas de pago activas]", "icono": "pago", "dondeAparece": ["franja"] } },
+  { "idOrigen": "beneficio-seguridad", "slug": "seguridad", "estado": "visible", "orden": 5, "datos": { "titulo": "Compra 100 % segura", "detalle": "Tus datos protegidos", "icono": "seguridad", "dondeAparece": ["franja"] } },
+  { "idOrigen": "beneficio-eficiencia", "slug": "eficiencia", "estado": "visible", "orden": 6, "datos": { "titulo": "Eficiencia energética", "detalle": "Cuida tu hogar y el planeta", "icono": "eficiencia", "dondeAparece": ["franja"] } }
+]

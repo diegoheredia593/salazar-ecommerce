@@ -1,0 +1,38 @@
+---
+import Icono from './Icono.astro';
+
+interface Props { pagina: number; total: number; porPagina: number }
+const { pagina, total, porPagina } = Astro.props;
+const paginas = Math.max(1, Math.ceil(total / porPagina));
+const enlace = (n: number) => {
+  const url = new URL(Astro.url);
+  if (n === 1) url.searchParams.delete('pagina');
+  else url.searchParams.set('pagina', String(n));
+  return `${url.pathname}${url.search}`;
+};
+---
+{
+  paginas > 1 && (
+    <nav class="paginacion" aria-label="Páginas">
+      {pagina > 1 && <a href={enlace(pagina - 1)} rel="prev"><Icono nombre="izquierda" tamano={18} />Anterior</a>}
+      <ol>
+        {Array.from({ length: paginas }, (_, i) => i + 1).map((n) => (
+          <li>
+            <a href={enlace(n)} aria-current={n === pagina ? 'page' : undefined}>
+              <span class="solo-lectores">Página </span>{n}
+            </a>
+          </li>
+        ))}
+      </ol>
+      {pagina < paginas && <a href={enlace(pagina + 1)} rel="next">Siguiente<Icono nombre="derecha" tamano={18} /></a>}
+    </nav>
+  )
+}
+
+<style>
+  .paginacion { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+  ol { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+  a { display: inline-flex; align-items: center; gap: 4px; min-width: 44px; min-height: 44px; padding: 0 12px; justify-content: center; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid var(--gris-linea); }
+  a:hover { border-color: var(--tinta); }
+  a[aria-current='page'] { background: var(--negro); color: var(--blanco); border-color: var(--negro); }
+</style>

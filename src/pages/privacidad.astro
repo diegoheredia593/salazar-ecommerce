@@ -1,0 +1,12 @@
+---
+import PaginaLegal from '../components/PaginaLegal.astro';
+import { contenido } from '../lib/content/contenido';
+
+const c = await contenido();
+---
+<PaginaLegal
+  titulo={c.texto('privacidad.contenido.titulo')}
+  html={c.rico('privacidad.contenido.texto')}
+  seoTitulo={c.texto('privacidad.seo.titulo')}
+  seoDescripcion={c.texto('privacidad.seo.descripcion')}
+/>

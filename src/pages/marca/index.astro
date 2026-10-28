@@ -1,0 +1,48 @@
+---
+import Icono from '../../components/Icono.astro';
+import Imagen from '../../components/Imagen.astro';
+import Base from '../../layouts/Base.astro';
+import { contenido } from '../../lib/content/contenido';
+import { marcaDe, todosLosProductos } from '../../lib/tienda/catalogo';
+import { tienda } from '../../lib/tienda/fuente';
+
+const c = await contenido();
+const t = await tienda();
+const [marcas, productos] = await Promise.all([c.coleccion('marcas'), todosLosProductos(t)]);
+const cuantos = (slug: string) => productos.filter((p) => marcaDe(p.nombre, marcas)?.slug === slug).length;
+const conProductos = marcas.map((m) => ({ ...m, total: cuantos(m.slug) })).filter((m) => m.total > 0);
+---
+<Base titulo={c.texto('marca.seo.titulo')} descripcion={c.texto('marca.seo.descripcion')}>
+  <div class="contenedor">
+    <nav class="migas" aria-label="Estás en"><ol><li><a href="/">Inicio</a></li><li aria-current="page">{c.texto('marca.encabezado.titulo')}</li></ol></nav>
+    <h1 class="titulo-seccion">{c.texto('marca.encabezado.titulo')}</h1>
+    <ul class="marcas">
+      {
+        conProductos.map((m) => (
+          <li>
+            <a href={`/marca/${m.slug}`}>
+              <span class="logo">{m.logo ? <Imagen foto={m.logo} alt={m.nombre} sizes="160px" /> : <span class="nombre">{m.nombre}</span>}</span>
+              <span class="pie">
+                <span>{m.logo ? m.nombre : ''}<small>{m.total === 1 ? '1 producto' : `${m.total} productos`}</small></span>
+                <Icono nombre="flecha" tamano={18} />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .marcas { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 768px) { .marcas { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1100px) { .marcas { grid-template-columns: repeat(6, 1fr); } }
+  a { display: grid; gap: 12px; padding: 16px; border-radius: var(--radio); background: var(--gris-tarjeta); text-decoration: none; height: 100%; }
+  a:hover { background: #e9e9e9; }
+  .logo { display: grid; place-items: center; min-height: 72px; }
+  .logo :global(img) { max-height: 48px; width: auto; }
+  .nombre { font-size: 1.25rem; font-weight: 900; text-transform: uppercase; text-align: center; letter-spacing: 0.02em; }
+  .pie { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+  small { display: block; color: var(--gris-texto); font-weight: 500; font-size: 0.8125rem; }
+</style>

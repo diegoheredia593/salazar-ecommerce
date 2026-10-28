@@ -1,0 +1,35 @@
+---
+import type { ElementoSucursales } from '../lib/content/colecciones.generado';
+import Icono from './Icono.astro';
+import Imagen from './Imagen.astro';
+
+interface Props { sucursales: ElementoSucursales[] }
+const { sucursales } = Astro.props;
+---
+<ul class="sucursales">
+  {
+    sucursales.map((s) => (
+      <li>
+        {s.foto && <Imagen foto={s.foto} class="foto" sizes="(min-width: 768px) 33vw, 100vw" />}
+        <div class="datos">
+          <h3>{s.nombre}</h3>
+          <p><Icono nombre="ubicacion" tamano={20} /><span>{s.direccion}{s.ciudad && `, ${s.ciudad}`}</span></p>
+          {s.horario && <p><Icono nombre="reloj" tamano={20} /><span>{s.horario}</span></p>}
+          {s.telefono && <p><Icono nombre="telefono" tamano={20} /><a href={`tel:${s.telefono.replace(/[^\d+]/g, '')}`}>{s.telefono}</a></p>}
+          {s.mapa && <a class="enlace-flecha" href={s.mapa} rel="noopener">Cómo llegar<Icono nombre="flecha" tamano={16} /></a>}
+        </div>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .sucursales { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  @media (min-width: 768px) { .sucursales { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } }
+  li { border: 1px solid var(--gris-linea); border-radius: var(--radio); overflow: hidden; background: var(--blanco); }
+  :global(.foto) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .datos { padding: 18px; display: grid; gap: 10px; }
+  h3 { font-size: 1.125rem; font-weight: 800; }
+  p { display: flex; gap: 10px; align-items: flex-start; }
+  p :global(svg) { color: var(--rojo); flex: none; }
+</style>

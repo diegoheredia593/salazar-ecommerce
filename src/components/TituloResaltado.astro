@@ -1,0 +1,10 @@
+---
+// Titular con la última palabra en rojo (estilo de la referencia). El cliente escribe el título completo.
+interface Props { texto: string; nivel?: 'h1' | 'h2'; class?: string }
+const { texto, nivel = 'h2', class: clase } = Astro.props;
+const corte = texto.trim().lastIndexOf(' ');
+const inicio = corte > 0 ? texto.slice(0, corte) : '';
+const ultima = corte > 0 ? texto.slice(corte + 1) : texto;
+const Etiqueta = nivel;
+---
+<Etiqueta class:list={['titular', clase]}>{inicio && `${inicio} `}<span class="rojo">{ultima}</span></Etiqueta>

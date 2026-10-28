@@ -1,0 +1,41 @@
+{
+  "name": "salazar-home-web",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "vendor/plataforma/core",
+    "vendor/plataforma/sdk"
+  ],
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "paquete": "tsx scripts/verificar-modelo.ts && tsx scripts/paquete.ts",
+    "verificar-modelo": "tsx scripts/verificar-modelo.ts",
+    "catalogo": "tsx scripts/catalogo.ts",
+    "tipos": "wrangler types",
+    "capturas": "tsx scripts/capturas.ts",
+    "check": "astro check",
+    "test": "npm run verificar-modelo && astro check"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.4.3",
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@plataforma/sdk": "^0.1.0",
+    "astro": "^7.4.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^26.6.6",
+    "exceljs": "^4.4.0",
+    "image-size": "^2.0.4",
+    "jszip": "^3.10.2",
+    "playwright-core": "^1.64.1",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.154.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261023.1": true
+  }
+}

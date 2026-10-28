@@ -1,0 +1,19 @@
+{
+  "key": "bannersPortada",
+  "label": "Banners de portada",
+  "singular": "banner",
+  "gender": "m",
+  "description": "El carrusel grande de la portada. Entre 2 y 4 banners. La última palabra del título sale en rojo.",
+  "titleField": "titulo",
+  "searchFields": ["titulo", "antetitulo"],
+  "sortBy": "order",
+  "fields": [
+    { "name": "antetitulo", "label": "Antetítulo", "control": "text", "max": 30, "help": "Texto pequeño y espaciado sobre el título, por ejemplo «Línea blanca»." },
+    { "name": "titulo", "label": "Título", "control": "text", "required": true, "max": 40, "help": "La última palabra sale en rojo." },
+    { "name": "texto", "label": "Texto", "control": "textLong", "max": 120 },
+    { "name": "botonTexto", "label": "Texto del botón", "control": "text", "max": 20 },
+    { "name": "botonEnlace", "label": "A dónde lleva el botón", "control": "link", "help": "Una página del sitio, por ejemplo /tienda?categoria=refrigeracion." },
+    { "name": "foto", "label": "Foto (computadora)", "control": "image", "aspectRatio": "16:7" },
+    { "name": "fotoMovil", "label": "Foto (celular)", "control": "image", "aspectRatio": "4:5", "help": "Si la dejas vacía, se usa la foto de computadora recortada." }
+  ]
+}

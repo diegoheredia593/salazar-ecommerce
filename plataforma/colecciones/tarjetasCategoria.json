@@ -1,0 +1,15 @@
+{
+  "key": "tarjetasCategoria",
+  "label": "Tarjetas de categoría",
+  "singular": "tarjeta",
+  "gender": "f",
+  "description": "La foto de cada categoría en la portada. Las categorías y sus productos se manejan en Tienda → Productos.",
+  "titleField": "nombre",
+  "searchFields": ["nombre", "categoria"],
+  "sortBy": "order",
+  "fields": [
+    { "name": "nombre", "label": "Nombre en la tarjeta", "control": "text", "required": true, "max": 30 },
+    { "name": "categoria", "label": "Categoría de la Tienda", "control": "text", "required": true, "help": "La dirección (slug) de la categoría en Tienda, por ejemplo «refrigeracion». Si no coincide, la tarjeta no se muestra." },
+    { "name": "foto", "label": "Foto", "control": "image", "aspectRatio": "1:1", "help": "El producto recortado, fondo blanco o transparente." }
+  ]
+}

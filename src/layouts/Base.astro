@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+import { scriptVisitas, type Foto } from '@plataforma/sdk';
+import Encabezado from '../components/Encabezado.astro';
+import Pie from '../components/Pie.astro';
+import { urlPublicaDeMedio } from '../lib/plataforma/medios';
+import { datosDelSitio } from '../lib/sitio';
+
+interface Props {
+  /** Título de la página (sin el nombre del sitio). Vacío = solo el título global. */
+  titulo: string;
+  descripcion?: string;
+  imagen?: Foto | null;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noIndexar?: boolean;
+  categoriaActual?: string | undefined;
+  seccionActual?: string | undefined;
+}
+const { titulo, descripcion, imagen, jsonLd, noIndexar = false, categoriaActual, seccionActual } = Astro.props;
+const sitio = await datosDelSitio(Astro);
+const { c } = sitio;
+
+const tituloSitio = c.texto('global.seo.titulo');
+const tituloCompleto = titulo && titulo !== tituloSitio ? `${titulo} · ${tituloSitio}` : tituloSitio;
+const desc = descripcion || c.texto('global.seo.descripcion');
+const foto = imagen ?? c.foto('global.seo.imagen');
+const canonica = new URL(Astro.url.pathname, Astro.url.origin).href;
+const verificacion = c.texto('global.seo.codigoVerificacion');
+---
+<!doctype html>
+<html lang="es-EC">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    {desc && <meta name="description" content={desc} />}
+    <link rel="canonical" href={canonica} />
+    {noIndexar && <meta name="robots" content="noindex" />}
+    {verificacion && <meta name="google-site-verification" content={verificacion} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_EC" />
+    <meta property="og:site_name" content={c.texto('global.marca.nombre')} />
+    <meta property="og:title" content={tituloCompleto} />
+    {desc && <meta property="og:description" content={desc} />}
+    <meta property="og:url" content={canonica} />
+    {foto && <meta property="og:image" content={urlPublicaDeMedio(foto.src)} />}
+    <meta name="theme-color" content="#111111" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
+    <script is:inline>document.documentElement.classList.add('js')</script>
+  </head>
+  <body>
+    <a class="saltar" href="#principal">Saltar al contenido</a>
+    {c.texto('global.anuncio.texto') && <p class="anuncio">{c.texto('global.anuncio.texto')}</p>}
+    <Encabezado sitio={sitio} categoriaActual={categoriaActual} seccionActual={seccionActual} />
+    <main id="principal" tabindex="-1">
+      <slot />
+    </main>
+    <Pie sitio={sitio} />
+    <div class="aviso-flotante" role="status" aria-live="polite" data-aviso-flotante></div>
+    <script is:inline set:html={scriptVisitas()} />
+    <script>
+      import '../scripts/sitio';
+    </script>
+  </body>
+</html>
+
+<style>
+  .anuncio {
+    background: var(--negro); color: var(--blanco); text-align: center; font-size: 0.8125rem; font-weight: 600;
+    padding: 8px var(--margen); border-bottom: 1px solid #2a2a2a;
+  }
+  main:focus { outline: none; }
+</style>

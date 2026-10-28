@@ -1,0 +1,253 @@
+---
+import Beneficios from '../components/Beneficios.astro';
+import Icono from '../components/Icono.astro';
+import Imagen from '../components/Imagen.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import TituloResaltado from '../components/TituloResaltado.astro';
+import Base from '../layouts/Base.astro';
+import { contenido } from '../lib/content/contenido';
+import { urlPublicaDeMedio } from '../lib/plataforma/medios';
+import { categoriasTienda, marcaDe, todosLosProductos } from '../lib/tienda/catalogo';
+import { tienda } from '../lib/tienda/fuente';
+
+const c = await contenido();
+const t = await tienda();
+const [banners, beneficios, tarjetas, marcas, categorias, productos] = await Promise.all([
+  c.coleccion('bannersPortada'),
+  c.coleccion('beneficios'),
+  c.coleccion('tarjetasCategoria'),
+  c.coleccion('marcas'),
+  categoriasTienda(t),
+  todosLosProductos(t),
+]);
+
+const sellos = beneficios.filter((b) => b.dondeAparece.includes('bajoBanner'));
+const franja = beneficios.filter((b) => b.dondeAparece.includes('franja'));
+const deNivel1 = categorias.filter((x) => !x.padre);
+const fotoDeCategoria = (slug: string) => tarjetas.find((x) => x.categoria === slug);
+const marcasPortada = marcas.filter((m) => m.mostrarEnPortada);
+const destacados = productos.filter((p) => p.destacado && !p.agotado).slice(0, 12);
+const pestanas = deNivel1.filter((cat) => destacados.some((p) => p.categoria?.slug === cat.slug));
+const tituloMarcas = c.texto('inicio.marcas.titulo');
+---
+<Base titulo={c.texto('inicio.seo.titulo')} descripcion={c.texto('inicio.seo.descripcion')}>
+  {
+    banners.length > 0 && (
+      <section class="hero" aria-roledescription="carrusel" aria-label="Destacados de la tienda" data-carrusel>
+        <div class="hero-pista" data-pista>
+          {banners.map((b, i) => (
+            <div class="diapositiva" data-diapositiva aria-roledescription="diapositiva" aria-label={`${i + 1} de ${banners.length}`} aria-hidden={i > 0 ? 'true' : undefined}>
+              <div class="hero-foto">
+                {b.foto && (
+                  <picture>
+                    {b.fotoMovil && <source media="(max-width: 767px)" srcset={urlPublicaDeMedio(b.fotoMovil.src)} />}
+                    <Imagen foto={b.foto} prioritaria={i === 0} sizes="100vw" />
+                  </picture>
+                )}
+              </div>
+              <div class="contenedor hero-texto">
+                {b.antetitulo && <p class="antetitulo">{b.antetitulo}</p>}
+                <TituloResaltado texto={b.titulo} nivel={i === 0 ? 'h1' : 'h2'} class="hero-titulo" />
+                {b.texto && <p class="hero-bajada">{b.texto}</p>}
+                {b.botonTexto && b.botonEnlace && (
+                  <a class="boton boton-rojo" href={b.botonEnlace}>{b.botonTexto}<Icono nombre="flecha" tamano={20} /></a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div class="contenedor hero-pie">
+          <Beneficios beneficios={sellos} variante="sellos" />
+          {banners.length > 1 && (
+            <div class="hero-controles">
+              <button type="button" class="control" data-anterior-diapositiva aria-label="Banner anterior"><Icono nombre="izquierda" /></button>
+              <div class="puntos">
+                {banners.map((_, i) => <button type="button" data-punto="" aria-label={`Ir al banner ${i + 1}`} aria-current={i === 0 ? 'true' : 'false'} />)}
+              </div>
+              <button type="button" class="control" data-siguiente-diapositiva aria-label="Banner siguiente"><Icono nombre="derecha" /></button>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="contenedor seccion" aria-labelledby="titulo-categorias">
+    <div class="cabecera-seccion">
+      <div>
+        <h2 id="titulo-categorias" class="titulo-seccion">{c.texto('inicio.categorias.titulo')}</h2>
+        {c.texto('inicio.categorias.subtitulo') && <p class="subtitulo-seccion">{c.texto('inicio.categorias.subtitulo')}</p>}
+      </div>
+      <a class="enlace-flecha" href="/tienda">{c.texto('inicio.categorias.enlaceTexto')}<Icono nombre="flecha" tamano={18} /></a>
+    </div>
+    <ul class="categorias">
+      {
+        deNivel1.map((cat) => {
+          const tarjeta = fotoDeCategoria(cat.slug);
+          return (
+            <li>
+              <a class="categoria" href={`/tienda?categoria=${cat.slug}`}>
+                <span class="categoria-foto"><Imagen foto={tarjeta?.foto} alt={cat.nombre} sizes="(min-width: 1100px) 14vw, 40vw" /></span>
+                <span class="categoria-nombre">{tarjeta?.nombre ?? cat.nombre}</span>
+                <span class="categoria-flecha"><Icono nombre="flecha" tamano={18} /></span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </section>
+
+  {
+    marcasPortada.length > 0 && (
+      <section class="contenedor marcas-portada" aria-label={tituloMarcas || 'Marcas destacadas'}>
+        {tituloMarcas && <h2 class="titulo-seccion">{tituloMarcas}</h2>}
+        <ul>
+          {marcasPortada.map((m) => (
+            <li class:list={['banner-marca', `fondo-${m.fondo ?? 'oscuro'}`]}>
+              {m.fotoBanner && <Imagen foto={m.fotoBanner} class="banner-marca-foto" sizes="(min-width: 768px) 50vw, 100vw" />}
+              <div class="banner-marca-texto">
+                {m.logo ? <Imagen foto={m.logo} alt={m.nombre} class="banner-marca-logo" sizes="160px" /> : <p class="banner-marca-nombre">{m.nombre}</p>}
+                {m.frase && <p class="banner-marca-frase">{m.frase}</p>}
+                <a class:list={['boton', 'boton-chico', m.fondo === 'claro' ? 'boton-rojo' : 'boton-blanco']} href={`/marca/${m.slug}`}>
+                  {m.botonTexto || 'Ver productos'}<span class="solo-lectores"> de {m.nombre}</span><Icono nombre="flecha" tamano={18} />
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    destacados.length > 0 && (
+      <section class="contenedor seccion" aria-labelledby="titulo-destacados">
+        <div class="cabecera-seccion destacados-cabecera">
+          <h2 id="titulo-destacados" class="titulo-seccion">{c.texto('inicio.destacados.titulo')}</h2>
+          {pestanas.length > 1 && (
+            <nav class="pestanas" aria-label="Filtrar destacados por categoría" data-pestanas>
+              <a href="/tienda" data-filtro="" aria-pressed="true">Todos</a>
+              {pestanas.map((cat) => <a href={`/tienda?categoria=${cat.slug}`} data-filtro={cat.slug} aria-pressed="false">{cat.nombre}</a>)}
+            </nav>
+          )}
+          <a class="enlace-flecha" href="/tienda">{c.texto('inicio.destacados.enlaceTexto')}<Icono nombre="flecha" tamano={18} /></a>
+        </div>
+        <ul class="grilla-productos seis">
+          {destacados.map((p) => <li><TarjetaProducto producto={p} marca={marcaDe(p.nombre, marcas)?.nombre ?? null} /></li>)}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    franja.length > 0 && (
+      <section class="contenedor franja" aria-label="Por qué comprar en Salazar">
+        <Beneficios beneficios={franja} variante="franja" />
+      </section>
+    )
+  }
+
+  <section class="cierre" aria-labelledby="titulo-cierre">
+    {c.foto('inicio.cierre.foto') && <Imagen foto={c.foto('inicio.cierre.foto')} class="cierre-foto" sizes="100vw" />}
+    <div class="contenedor cierre-texto">
+      <h2 id="titulo-cierre" class="titular cierre-titulo">{c.texto('inicio.cierre.titulo')}</h2>
+      {c.texto('inicio.cierre.texto') && <p>{c.texto('inicio.cierre.texto')}</p>}
+      <a class="boton boton-rojo" href={c.texto('inicio.cierre.enlace')}>{c.texto('inicio.cierre.boton')}<Icono nombre="flecha" tamano={20} /></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Carrusel */
+  .hero { position: relative; background: linear-gradient(180deg, #f6f6f6, #ececec); }
+  .hero-pista { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .hero-pista::-webkit-scrollbar { display: none; }
+  .diapositiva { position: relative; flex: 0 0 100%; scroll-snap-align: start; min-height: 420px; display: flex; align-items: center; }
+  @media (min-width: 1024px) { .diapositiva { min-height: 520px; } }
+  /* Mientras el banner no tenga foto, sin el alto de la foto. */
+  .diapositiva:not(:has(img)) { min-height: 0; }
+  .hero-foto { position: absolute; inset: 0; }
+  .hero-foto :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: right center; }
+  .hero-foto:has(img)::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.96) 0%, rgb(255 255 255 / 0.85) 38%, rgb(255 255 255 / 0) 62%);
+  }
+  @media (max-width: 767px) { .hero-foto:has(img)::after { background: linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.95) 60%); } }
+  .hero-texto { position: relative; display: grid; gap: 18px; justify-items: start; padding-block: 48px 32px; }
+  .hero-texto > * { max-width: 560px; }
+  :global(.hero-titulo) { font-size: clamp(2.5rem, 1.6rem + 4.2vw, 4.25rem); }
+  .hero-bajada { font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem); max-width: 34ch; }
+  .hero-pie { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 0 28px; flex-wrap: wrap; }
+  .hero-controles { display: none; align-items: center; gap: 12px; }
+  :global(.js) .hero.activo .hero-controles { display: flex; }
+  .control { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--blanco); box-shadow: var(--sombra); cursor: pointer; display: grid; place-items: center; }
+  .puntos { display: flex; gap: 6px; }
+  .puntos button { width: 10px; height: 10px; border-radius: 50%; border: 0; padding: 0; background: #b9b9b9; cursor: pointer; }
+  .puntos button[aria-current='true'] { background: var(--rojo); width: 24px; border-radius: 99px; }
+
+  /* Categorías: carrusel horizontal en móvil, 7 columnas en escritorio */
+  .categorias {
+    list-style: none; margin: 0 calc(var(--margen) * -1); padding: 4px var(--margen) 12px; display: grid; grid-auto-flow: column;
+    grid-auto-columns: 42%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin;
+  }
+  @media (min-width: 640px) { .categorias { grid-auto-columns: 28%; } }
+  @media (min-width: 1100px) {
+    .categorias { grid-auto-flow: row; grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: visible; margin: 0; padding: 0; }
+  }
+  .categorias li { scroll-snap-align: start; }
+  .categoria {
+    position: relative; display: grid; grid-template-rows: 1fr auto; gap: 10px; height: 100%; padding: 14px; border-radius: var(--radio);
+    background: var(--gris-tarjeta); text-decoration: none; transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+  .categoria:hover { background: #e9e9e9; }
+  .categoria-foto { aspect-ratio: 1; display: grid; place-items: center; }
+  .categoria-foto :global(img) { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .categoria-nombre { font-weight: 700; font-size: 0.875rem; line-height: 1.25; padding-right: 40px; min-height: 2.5em; display: flex; align-items: center; }
+  .categoria-flecha {
+    position: absolute; right: 12px; bottom: 12px; width: 32px; height: 32px; border-radius: 50%; background: var(--blanco);
+    display: grid; place-items: center; transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .categoria:hover .categoria-flecha { background: var(--rojo); color: var(--blanco); }
+
+  /* Banners de marca */
+  .marcas-portada ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  @media (min-width: 768px) { .marcas-portada ul { grid-template-columns: repeat(2, 1fr); } }
+  .banner-marca { position: relative; overflow: hidden; border-radius: var(--radio-grande); min-height: 240px; display: flex; align-items: center; }
+  @media (min-width: 1024px) { .banner-marca { min-height: 300px; } }
+  .fondo-oscuro { background: linear-gradient(120deg, #0d0d0d, #2b2420); color: var(--blanco); }
+  .fondo-azul { background: linear-gradient(120deg, #0c1f3d, #173a6b); color: var(--blanco); }
+  .fondo-claro { background: var(--gris-tarjeta); color: var(--tinta); }
+  :global(.banner-marca-foto) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .banner-marca:has(:global(.banner-marca-foto))::before {
+    content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0) 70%);
+  }
+  .fondo-claro:has(:global(.banner-marca-foto))::before { background: linear-gradient(90deg, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0) 70%); }
+  .banner-marca-texto { position: relative; z-index: 2; display: grid; gap: 16px; justify-items: start; padding: 32px; max-width: 360px; }
+  :global(.banner-marca-logo) { max-height: 44px; width: auto; }
+  .banner-marca-nombre { font-size: 2.25rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1; }
+  .banner-marca-frase { font-size: 1.5rem; font-weight: 600; line-height: 1.2; }
+
+  /* Destacados */
+  .destacados-cabecera { align-items: center; }
+  .pestanas { display: flex; gap: 8px; overflow-x: auto; order: 3; width: 100%; padding-bottom: 4px; }
+  @media (min-width: 1024px) { .pestanas { order: 0; width: auto; margin-left: auto; } }
+  .pestanas a {
+    flex: none; padding: 8px 16px; border-radius: 99px; background: var(--gris-fondo); text-decoration: none; font-size: 0.875rem; font-weight: 600;
+  }
+  .pestanas a[aria-pressed='true'] { background: var(--rojo); color: var(--blanco); }
+  .pestanas a:not([aria-pressed='true']):hover { background: #e6e6e6; }
+
+  .franja { padding-block: 8px 24px; }
+  @media (min-width: 1024px) { .franja { border-block: 1px solid var(--gris-linea); padding-block: 28px; } }
+
+  /* Cierre */
+  .cierre { position: relative; overflow: hidden; margin-top: 40px; background: linear-gradient(120deg, #1b1b1b, #3a332d); color: var(--blanco); min-height: 360px; display: flex; align-items: center; }
+  :global(.cierre-foto) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cierre:has(:global(.cierre-foto)) { color: var(--tinta); }
+  .cierre:has(:global(.cierre-foto))::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.8) 40%, rgb(255 255 255 / 0) 65%); }
+  .cierre-texto { position: relative; z-index: 2; display: grid; gap: 18px; justify-items: start; padding-block: 56px; }
+  .cierre-texto > * { max-width: 520px; }
+  .cierre-titulo { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); text-transform: none; font-weight: 900; }
+  .cierre-texto p { font-size: 1.125rem; }
+</style>

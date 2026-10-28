@@ -1,0 +1,84 @@
+---
+// Un formulario de la plataforma. Los campos salen de plataforma/formularios/<tipo>.json al compilar: los `name` del
+// HTML son por construcción los de la definición (un campo de más daría 422). Funciona sin JavaScript (POST y vuelve
+// con ?formulario=<tipo>&estado=ok|error); con JavaScript envía sin recargar y marca cada error junto a su campo.
+import { env } from 'cloudflare:workers';
+
+interface CampoFormulario { name: string; label: string; type: string; required: boolean; max?: number; options?: { value: string; label: string }[] }
+interface Definicion { key: string; fields: CampoFormulario[] }
+
+interface Props {
+  tipo: string;
+  boton: string;
+  exito: string;
+  /** Campos que llena la página (p. ej. el producto en avisoStock): van ocultos con este valor. */
+  ocultos?: Record<string, string>;
+}
+const { tipo, boton, exito, ocultos = {} } = Astro.props;
+
+const definiciones = import.meta.glob<Definicion>('/plataforma/formularios/*.json', { eager: true, import: 'default' });
+const def = definiciones[`/plataforma/formularios/${tipo}.json`];
+if (!def) throw new Error(`El formulario «${tipo}» no tiene definición en plataforma/formularios.`);
+
+const MAXIMO: Record<string, number> = { text: 200, email: 160, phone: 30, textLong: 2000, option: 80 }; // FORM_DEFAULT_MAX
+const visibles = def.fields.filter((f) => !(f.name in ocultos));
+const id = (n: string) => `${tipo}-${n}`;
+const estado = Astro.url.searchParams.get('formulario') === tipo ? Astro.url.searchParams.get('estado') : null;
+const sitekey = String(env.TURNSTILE_SITE_KEY ?? '');
+const autocompletar: Record<string, string> = { nombre: 'name', email: 'email', telefono: 'tel', empresa: 'organization', ciudad: 'address-level2' };
+---
+<form id={`formulario-${tipo}`} class="formulario" method="post" action={`/api/formularios/${tipo}`} data-formulario data-exito={exito} novalidate>
+  {Object.entries(ocultos).map(([n, v]) => <input type="hidden" name={n} value={v} />)}
+  <div class="senuelo" aria-hidden="true">
+    <label for={id('sitioWeb')}>No llenes este campo</label>
+    <input id={id('sitioWeb')} type="text" name="sitioWeb" tabindex="-1" autocomplete="off" />
+  </div>
+  {
+    visibles.map((f) => (
+      <div class:list={['campo', { ancho: f.type === 'textLong' }]}>
+        <label for={id(f.name)}>
+          {f.label}
+          {!f.required && <span class="opcional"> (opcional)</span>}
+        </label>
+        {f.type === 'textLong' ? (
+          <textarea class="entrada" id={id(f.name)} name={f.name} required={f.required} maxlength={f.max ?? MAXIMO[f.type]} aria-describedby={id(`${f.name}-error`)} />
+        ) : f.type === 'option' ? (
+          <select class="entrada" id={id(f.name)} name={f.name} required={f.required} aria-describedby={id(`${f.name}-error`)}>
+            <option value="">Elige una opción</option>
+            {(f.options ?? []).map((o) => <option value={o.value}>{o.label}</option>)}
+          </select>
+        ) : (
+          <input
+            class="entrada"
+            id={id(f.name)}
+            name={f.name}
+            type={f.type === 'email' ? 'email' : f.type === 'phone' ? 'tel' : 'text'}
+            inputmode={f.type === 'phone' ? 'tel' : undefined}
+            autocomplete={autocompletar[f.name]}
+            required={f.required}
+            maxlength={f.max ?? MAXIMO[f.type]}
+            aria-describedby={id(`${f.name}-error`)}
+          />
+        )}
+        <p class="error-campo" id={id(`${f.name}-error`)} data-error={f.name}></p>
+      </div>
+    ))
+  }
+  {sitekey && <div class="cf-turnstile ancho" data-sitekey={sitekey} data-language="es"></div>}
+  <div class="ancho pie-formulario">
+    <button class="boton boton-rojo" type="submit">{boton}</button>
+    <p
+      class:list={['mensaje', { 'mensaje-ok': estado === 'ok', 'mensaje-error': estado === 'error' }]}
+      role="status"
+      aria-live="polite"
+      data-mensaje
+    >{estado === 'ok' ? exito : estado === 'error' ? 'No se pudo enviar. Revisa los datos e inténtalo de nuevo.' : estado === 'limite' ? 'Enviaste varios mensajes seguidos. Espera unos minutos e inténtalo de nuevo.' : ''}</p>
+  </div>
+</form>
+{sitekey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<style>
+  .formulario { display: grid; gap: 16px; }
+  @media (min-width: 768px) { .formulario { grid-template-columns: 1fr 1fr; } .ancho { grid-column: 1 / -1; } }
+  .pie-formulario { display: grid; gap: 12px; justify-items: start; }
+</style>

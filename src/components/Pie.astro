@@ -1,0 +1,108 @@
+---
+import type { DatosDelSitio } from '../lib/sitio';
+import { enlaceWhatsapp } from '../lib/sitio';
+import Icono from './Icono.astro';
+
+interface Props { sitio: DatosDelSitio }
+const { c, categorias, sucursales } = Astro.props.sitio;
+const nombre = c.texto('global.marca.nombre');
+const wa = enlaceWhatsapp(c.texto('global.contacto.whatsapp'), c.texto('global.contacto.mensajeWhatsapp'));
+const telefono = c.texto('global.contacto.telefono');
+const correo = c.texto('global.contacto.correo');
+const redes = [
+  { nombre: 'Facebook', icono: 'facebook', url: c.texto('global.redes.facebook') },
+  { nombre: 'Instagram', icono: 'instagram', url: c.texto('global.redes.instagram') },
+  { nombre: 'TikTok', icono: 'tiktok', url: c.texto('global.redes.tiktok') },
+] as const;
+const pagos = c.texto('global.footer.pagos');
+---
+<footer class="pie">
+  <div class="contenedor columnas">
+    <div class="marca">
+      <p class="nombre">{nombre}</p>
+      <p class="frase">{c.texto('global.footer.frase')}</p>
+      {
+        redes.some((r) => r.url) && (
+          <ul class="redes" aria-label="Redes sociales">
+            {redes.filter((r) => r.url).map((r) => (
+              <li><a href={r.url} rel="noopener" aria-label={r.nombre}><Icono nombre={r.icono} /></a></li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+    <nav aria-labelledby="pie-categorias">
+      <h2 id="pie-categorias">Categorías</h2>
+      <ul>
+        {categorias.map((cat) => <li><a href={`/tienda?categoria=${cat.slug}`}>{cat.nombre}</a></li>)}
+        <li><a href="/promociones">{c.texto('global.menu.promociones')}</a></li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="pie-ayuda">
+      <h2 id="pie-ayuda">Ayuda</h2>
+      <ul>
+        <li><a href="/mi-pedido">Mi pedido</a></li>
+        <li><a href="/garantias-y-devoluciones">Garantías y devoluciones</a></li>
+        <li><a href="/terminos">Términos y condiciones</a></li>
+        <li><a href="/privacidad">Política de privacidad</a></li>
+        <li><a href="/marca">Marcas</a></li>
+        <li><a href="/nosotros">Nosotros</a></li>
+        <li><a href="/contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h2>Contacto</h2>
+      <ul class="contacto">
+        {telefono && <li><Icono nombre="telefono" tamano={20} /><a href={`tel:${telefono.replace(/[^\d+]/g, '')}`}>{telefono}</a></li>}
+        {wa && <li><Icono nombre="whatsapp" tamano={20} /><a href={wa} rel="noopener">WhatsApp</a></li>}
+        {correo && <li><Icono nombre="correo" tamano={20} /><a href={`mailto:${correo}`}>{correo}</a></li>}
+        <li><Icono nombre="ubicacion" tamano={20} /><span>{c.texto('global.footer.direccion')}</span></li>
+        <li><Icono nombre="reloj" tamano={20} /><span>{c.texto('global.footer.horario')}</span></li>
+      </ul>
+      {
+        sucursales.length > 1 && (
+          <p class="sucursales"><a href="/contacto">Ver nuestras {sucursales.length} sucursales</a></p>
+        )
+      }
+    </div>
+  </div>
+  <div class="contenedor legal">
+    {pagos && <p>{pagos}</p>}
+    <p>{c.texto('global.footer.notaPrecios')}</p>
+    <p>© {new Date().getFullYear()} {nombre}</p>
+  </div>
+</footer>
+
+{
+  wa && (
+    <a class="wa-flotante" href={wa} rel="noopener" aria-label="Escríbenos por WhatsApp">
+      <Icono nombre="whatsapp" tamano={30} />
+    </a>
+  )
+}
+
+<style>
+  .pie { background: var(--negro); color: #e9e9e9; margin-top: 56px; padding-top: 48px; }
+  .columnas { display: grid; gap: 32px; grid-template-columns: 1fr; }
+  @media (min-width: 768px) { .columnas { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1100px) { .columnas { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; } }
+  .nombre { font-size: 1.375rem; font-weight: 900; text-transform: uppercase; color: var(--blanco); font-variation-settings: 'wdth' 110; }
+  .frase { margin-top: 10px; color: #bdbdbd; max-width: 36ch; }
+  h2 { font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blanco); margin-bottom: 14px; font-weight: 800; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  a { text-decoration: none; color: #e9e9e9; }
+  a:hover { color: var(--blanco); text-decoration: underline; text-underline-offset: 3px; }
+  .contacto li { display: flex; gap: 10px; align-items: flex-start; }
+  .contacto :global(svg) { color: var(--rojo); flex: none; margin-top: 1px; }
+  .redes { display: flex; gap: 8px; margin-top: 18px; }
+  .redes a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #3a3a3a; }
+  .redes a:hover { border-color: var(--blanco); }
+  .sucursales { margin-top: 12px; }
+  .legal { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-block: 22px 28px; margin-top: 40px; border-top: 1px solid #2c2c2c; color: #a9a9a9; font-size: 0.875rem; }
+
+  .wa-flotante {
+    position: fixed; right: 16px; bottom: 16px; z-index: 40; width: 56px; height: 56px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--verde-wa); color: var(--blanco); box-shadow: 0 6px 20px rgb(0 0 0 / 0.25);
+  }
+  @media (min-width: 1024px) { .wa-flotante { display: none; } }
+</style>

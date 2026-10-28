@@ -1,0 +1,27 @@
+---
+import Icono from '../components/Icono.astro';
+import Base from '../layouts/Base.astro';
+import { contenido } from '../lib/content/contenido';
+import { enlaceWhatsapp } from '../lib/sitio';
+
+// La Tienda no tiene cuentas de comprador: el pedido se sigue con el enlace /compra/<token> que llega por correo.
+const c = await contenido();
+const wa = enlaceWhatsapp(c.texto('global.contacto.whatsapp'), c.texto('global.contacto.mensajeWhatsapp'));
+---
+<Base titulo={c.texto('pedido.seo.titulo')} descripcion={c.texto('pedido.seo.descripcion')} seccionActual="pedido">
+  <div class="contenedor angosto">
+    <Icono nombre="pedido" tamano={48} class="icono" />
+    <h1 class="titulo-seccion">{c.texto('pedido.explicacion.titulo')}</h1>
+    <div class="prosa" set:html={c.rico('pedido.explicacion.texto')} />
+    <div class="botones">
+      {wa && <a class="boton boton-wa" href={wa} rel="noopener"><Icono nombre="whatsapp" tamano={20} />Escríbenos por WhatsApp</a>}
+      <a class="boton boton-borde" href="/tienda">Ver la tienda</a>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .angosto { max-width: 760px; display: grid; gap: 20px; justify-items: start; padding-block: 48px 24px; }
+  :global(.icono) { color: var(--rojo); }
+  .botones { display: flex; gap: 10px; flex-wrap: wrap; }
+</style>

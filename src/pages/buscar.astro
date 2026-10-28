@@ -1,0 +1,47 @@
+---
+import Icono from '../components/Icono.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import Base from '../layouts/Base.astro';
+import { contenido } from '../lib/content/contenido';
+import { marcaDe, ordenar } from '../lib/tienda/catalogo';
+import { tienda } from '../lib/tienda/fuente';
+
+const c = await contenido();
+const q = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 80);
+const t = await tienda();
+// La Tienda busca en el nombre y la descripción corta (productos({ buscar })).
+const [marcas, resultado] = await Promise.all([
+  c.coleccion('marcas'),
+  q ? t.productos({ buscar: q, porPagina: 100 }) : Promise.resolve(null),
+]);
+const productos = resultado ? ordenar(resultado.productos, 'destacados') : [];
+---
+<Base titulo={q ? `${c.texto('buscar.seo.titulo')}: ${q}` : c.texto('buscar.seo.titulo')} descripcion={c.texto('buscar.seo.descripcion')} noIndexar>
+  <div class="contenedor">
+    <h1 class="titulo-seccion">{q ? <>Resultados para «{q}»</> : 'Buscar productos'}</h1>
+    <form class="buscar" action="/buscar" method="get" role="search">
+      <label class="solo-lectores" for="buscar-pagina">Buscar productos</label>
+      <input id="buscar-pagina" class="entrada" type="search" name="q" value={q} placeholder="¿Qué producto estás buscando?" />
+      <button class="boton boton-rojo" type="submit"><Icono nombre="buscar" tamano={20} />Buscar</button>
+    </form>
+    {
+      q && (
+        <p class="cantidad" role="status">{productos.length === 1 ? '1 producto' : `${productos.length} productos`}</p>
+      )
+    }
+    {
+      q && productos.length > 0 && (
+        <ul class="grilla-productos">{productos.map((p) => <li><TarjetaProducto producto={p} marca={marcaDe(p.nombre, marcas)?.nombre ?? null} /></li>)}</ul>
+      )
+    }
+    {q && productos.length === 0 && <p class="vacio">{c.texto('buscar.vacio.texto')}</p>}
+  </div>
+</Base>
+
+<style>
+  h1 { margin-top: 24px; }
+  .buscar { display: flex; gap: 8px; margin: 20px 0 24px; max-width: 640px; }
+  .buscar .entrada { flex: 1; }
+  .cantidad { color: var(--gris-texto); margin-bottom: 12px; }
+  .vacio { padding: 48px 16px; text-align: center; background: var(--gris-fondo); border-radius: var(--radio); }
+</style>

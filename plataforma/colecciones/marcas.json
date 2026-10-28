@@ -1,0 +1,27 @@
+{
+  "key": "marcas",
+  "label": "Marcas",
+  "singular": "marca",
+  "gender": "f",
+  "description": "Las marcas que vendes: su página propia, el filtro de la tienda y los banners de la portada.",
+  "titleField": "nombre",
+  "searchFields": ["nombre"],
+  "sortBy": { "field": "nombre", "direction": "asc" },
+  "slugField": "slug",
+  "fields": [
+    { "name": "nombre", "label": "Nombre", "control": "text", "required": true, "max": 40 },
+    { "name": "slug", "label": "Dirección", "control": "slug", "from": "nombre", "required": true, "help": "La página de la marca queda en /marca/<dirección>." },
+    { "name": "nombreEnProductos", "label": "Cómo aparece en el nombre de los productos", "control": "text", "required": true, "max": 40, "help": "Un producto es de esta marca si su nombre en Tienda → Productos contiene esta palabra exacta, por ejemplo «LG» o «Black+Decker»." },
+    { "name": "logo", "label": "Logo", "control": "image", "help": "Logo oficial de la marca, fondo transparente." },
+    { "name": "frase", "label": "Frase del banner", "control": "text", "max": 40 },
+    { "name": "botonTexto", "label": "Texto del botón del banner", "control": "text", "max": 20 },
+    { "name": "fotoBanner", "label": "Foto del banner", "control": "image", "aspectRatio": "5:2" },
+    { "name": "fondo", "label": "Fondo del banner", "control": "option", "options": [
+      { "value": "oscuro", "label": "Oscuro" },
+      { "value": "claro", "label": "Claro" },
+      { "value": "azul", "label": "Azul" }
+    ] },
+    { "name": "mostrarEnPortada", "label": "Mostrar en la portada", "control": "checkbox", "help": "Los banners de marca de la portada salen de las marcas marcadas aquí." },
+    { "name": "descripcion", "label": "Descripción", "control": "rich", "help": "Se ve en la página de la marca, sobre sus productos." }
+  ]
+}

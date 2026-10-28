@@ -1,0 +1,45 @@
+---
+import Imagen from '../components/Imagen.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import TituloResaltado from '../components/TituloResaltado.astro';
+import Base from '../layouts/Base.astro';
+import { contenido } from '../lib/content/contenido';
+import { enOferta, marcaDe, ordenar, todosLosProductos } from '../lib/tienda/catalogo';
+import { tienda } from '../lib/tienda/fuente';
+
+const c = await contenido();
+const t = await tienda();
+const [marcas, catalogo] = await Promise.all([c.coleccion('marcas'), todosLosProductos(t)]);
+// Promoción = descuento automático vigente o «precio anterior» cargado en la Tienda.
+const productos = ordenar(catalogo.filter(enOferta), 'destacados');
+const foto = c.foto('promociones.encabezado.foto');
+---
+<Base titulo={c.texto('promociones.seo.titulo')} descripcion={c.texto('promociones.seo.descripcion')} seccionActual="promociones">
+  <div class="contenedor">
+    <nav class="migas" aria-label="Estás en"><ol><li><a href="/">Inicio</a></li><li aria-current="page">{c.texto('promociones.encabezado.titulo')}</li></ol></nav>
+    <header class:list={['cabecera', { 'con-foto': Boolean(foto) }]}>
+      {foto && <Imagen foto={foto} class="cabecera-foto" prioritaria sizes="100vw" />}
+      <div class="cabecera-texto">
+        <TituloResaltado texto={c.texto('promociones.encabezado.titulo')} nivel="h1" class="titulo-promo" />
+        {c.texto('promociones.encabezado.texto') && <p>{c.texto('promociones.encabezado.texto')}</p>}
+      </div>
+    </header>
+    {
+      productos.length > 0 ? (
+        <ul class="grilla-productos">{productos.map((p) => <li><TarjetaProducto producto={p} marca={marcaDe(p.nombre, marcas)?.nombre ?? null} /></li>)}</ul>
+      ) : (
+        <p class="vacio">{c.texto('promociones.vacio.texto')}</p>
+      )
+    }
+    <p class="nota-iva">{c.texto('global.footer.notaPrecios')}</p>
+  </div>
+</Base>
+
+<style>
+  .cabecera { position: relative; overflow: hidden; border-radius: var(--radio-grande); background: var(--gris-tarjeta); margin-bottom: 28px; min-height: 180px; display: flex; align-items: center; }
+  :global(.cabecera-foto) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .con-foto::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0) 70%); }
+  .cabecera-texto { position: relative; z-index: 2; padding: 32px; display: grid; gap: 10px; max-width: 620px; }
+  :global(.titulo-promo) { font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem); }
+  .vacio { padding: 48px 16px; text-align: center; background: var(--gris-fondo); border-radius: var(--radio); }
+</style>

@@ -1,0 +1,24 @@
+{
+  "pages": [
+    { "key": "inicio", "name": "Inicio", "route": "/" },
+    { "key": "tienda", "name": "Tienda y ficha de producto", "route": "/tienda", "blockPrefixes": ["producto"] },
+    { "key": "marca", "name": "Marcas", "route": "/marca" },
+    { "key": "promociones", "name": "Promociones", "route": "/promociones" },
+    { "key": "buscar", "name": "Buscar", "route": "/buscar" },
+    { "key": "carrito", "name": "Carrito", "route": "/carrito" },
+    { "key": "nosotros", "name": "Nosotros", "route": "/nosotros" },
+    { "key": "contacto", "name": "Contacto", "route": "/contacto" },
+    { "key": "pedido", "name": "Mi pedido", "route": "/mi-pedido" },
+    { "key": "terminos", "name": "Términos y condiciones", "route": "/terminos" },
+    { "key": "privacidad", "name": "Política de privacidad", "route": "/privacidad" },
+    { "key": "garantias", "name": "Garantías y devoluciones", "route": "/garantias-y-devoluciones" }
+  ],
+  "collections": [
+    { "collection": "bannersPortada", "page": "inicio" },
+    { "collection": "tarjetasCategoria", "page": "inicio" },
+    { "collection": "marcas", "page": "marca", "alsoOn": ["inicio", "tienda"] },
+    { "collection": "beneficios", "page": "inicio", "alsoOn": ["tienda"] },
+    { "collection": "sucursales", "page": "contacto", "alsoOn": ["nosotros"] },
+    { "collection": "preguntas", "page": "garantias", "alsoOn": ["tienda"] }
+  ]
+}

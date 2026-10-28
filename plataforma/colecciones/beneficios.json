@@ -1,0 +1,28 @@
+{
+  "key": "beneficios",
+  "label": "Beneficios",
+  "singular": "beneficio",
+  "gender": "m",
+  "description": "Los sellos bajo el banner, la franja de cuatro beneficios de la portada y el bloque de confianza de la ficha.",
+  "titleField": "titulo",
+  "searchFields": ["titulo"],
+  "sortBy": "order",
+  "fields": [
+    { "name": "titulo", "label": "Título", "control": "text", "required": true, "max": 30 },
+    { "name": "detalle", "label": "Detalle", "control": "text", "max": 40, "help": "No prometas una forma de pago o un servicio que no esté activo." },
+    { "name": "icono", "label": "Ícono", "control": "option", "required": true, "options": [
+      { "value": "envio", "label": "Envío" },
+      { "value": "garantia", "label": "Garantía" },
+      { "value": "instalacion", "label": "Instalación" },
+      { "value": "asesoria", "label": "Asesoría" },
+      { "value": "pago", "label": "Pago" },
+      { "value": "seguridad", "label": "Seguridad" },
+      { "value": "eficiencia", "label": "Eficiencia" }
+    ] },
+    { "name": "dondeAparece", "label": "Dónde aparece", "control": "options", "required": true, "options": [
+      { "value": "bajoBanner", "label": "Bajo el banner" },
+      { "value": "franja", "label": "Franja de beneficios" },
+      { "value": "ficha", "label": "Ficha de producto" }
+    ] }
+  ]
+}

@@ -1,0 +1,212 @@
+---
+import type { DatosDelSitio } from '../lib/sitio';
+import { enlaceWhatsapp } from '../lib/sitio';
+import Icono from './Icono.astro';
+import Imagen from './Imagen.astro';
+
+interface Props { sitio: DatosDelSitio; categoriaActual?: string | undefined; seccionActual?: string | undefined }
+const { sitio, categoriaActual, seccionActual } = Astro.props;
+const { c, categorias, marcasPorCategoria, articulos } = sitio;
+const logo = c.foto('global.marca.logo');
+const nombre = c.texto('global.marca.nombre');
+const wa = enlaceWhatsapp(c.texto('global.contacto.whatsapp'), c.texto('global.contacto.mensajeWhatsapp'));
+const q = Astro.url.pathname === '/buscar' ? (Astro.url.searchParams.get('q') ?? '') : '';
+---
+<header class="encabezado">
+  <div class="contenedor fila">
+    <details class="menu-movil" data-menu-movil>
+      <summary class="icono-boton" aria-label="Abrir menú de categorías"><Icono nombre="menu" /></summary>
+      <div class="panel" role="dialog" aria-label="Categorías">
+        <div class="panel-cabecera">
+          <span class="panel-titulo">Categorías</span>
+          <button type="button" class="icono-boton" data-cerrar-menu aria-label="Cerrar menú"><Icono nombre="cerrar" /></button>
+        </div>
+        <ul>
+          {
+            categorias.map((cat) => (
+              <li>
+                <a href={`/tienda?categoria=${cat.slug}`} aria-current={cat.slug === categoriaActual ? 'page' : undefined}>
+                  {cat.nombre}
+                  <Icono nombre="derecha" tamano={18} />
+                </a>
+              </li>
+            ))
+          }
+          <li><a class="promo" href="/promociones" aria-current={seccionActual === 'promociones' ? 'page' : undefined}>{c.texto('global.menu.promociones')}</a></li>
+        </ul>
+        <ul class="secundario">
+          <li><a href="/marca">Marcas</a></li>
+          <li><a href="/mi-pedido">Mi pedido</a></li>
+          <li><a href="/contacto">Contacto</a></li>
+        </ul>
+        {wa && <a class="boton boton-wa boton-ancho" href={wa} rel="noopener"><Icono nombre="whatsapp" tamano={20} />{c.texto('global.encabezado.botonWhatsapp')}</a>}
+      </div>
+    </details>
+
+    <a class="logo" href="/" aria-label={`${nombre}, inicio`}>
+      {
+        logo ? (
+          <Imagen foto={logo} alt={nombre} prioritaria sizes="200px" />
+        ) : (
+          <span class="logo-texto" aria-hidden="true">
+            <Icono nombre="asesoria" tamano={34} class="logo-casa" />
+            <span><strong>Salazar</strong><small>Home Solutions</small></span>
+          </span>
+        )
+      }
+    </a>
+
+    <form class="buscador" action="/buscar" method="get" role="search">
+      <label class="solo-lectores" for="buscar-encabezado">Buscar productos</label>
+      <input id="buscar-encabezado" class="entrada" type="search" name="q" value={q} placeholder="¿Qué producto estás buscando?" autocomplete="off" />
+      <button class="boton-buscar" type="submit" aria-label="Buscar"><Icono nombre="buscar" tamano={20} /></button>
+    </form>
+
+    <nav class="acciones" aria-label="Tu compra">
+      <a class="icono-boton lupa" href="/buscar" aria-label="Buscar"><Icono nombre="buscar" /></a>
+      <a class="accion" href="/mi-pedido" aria-current={seccionActual === 'pedido' ? 'page' : undefined}>
+        <Icono nombre="pedido" /><span>Mi pedido</span>
+      </a>
+      <a class="accion" href="/carrito" aria-current={seccionActual === 'carrito' ? 'page' : undefined}>
+        <span class="con-contador">
+          <Icono nombre="carrito" />
+          <span class="contador" data-contador-carrito hidden={articulos === 0}>{articulos}</span>
+        </span>
+        <span>Carrito</span>
+        <span class="solo-lectores" data-contador-texto>{articulos === 1 ? '1 artículo' : `${articulos} artículos`}</span>
+      </a>
+      <a class="boton boton-negro boton-chico wa" href={wa ?? '/contacto'} rel={wa ? 'noopener' : undefined}>
+        <Icono nombre="whatsapp" tamano={20} />{c.texto('global.encabezado.botonWhatsapp')}
+      </a>
+    </nav>
+  </div>
+
+  <nav class="barra-categorias" aria-label="Categorías">
+    <div class="contenedor">
+      <ul>
+        {
+          categorias.map((cat) => {
+            const marcas = marcasPorCategoria.get(cat.slug) ?? [];
+            return (
+              <li class:list={{ 'con-menu': marcas.length > 0 }}>
+                <a href={`/tienda?categoria=${cat.slug}`} aria-current={cat.slug === categoriaActual ? 'page' : undefined}>
+                  {cat.nombre}
+                  {marcas.length > 0 && <Icono nombre="abajo" tamano={16} />}
+                </a>
+                {marcas.length > 0 && (
+                  <div class="desplegable">
+                    <p>Marcas en {cat.nombre}</p>
+                    <ul>
+                      {marcas.map((m) => (
+                        <li><a href={`/tienda?categoria=${cat.slug}&marca=${m.slug}`}>{m.nombre}</a></li>
+                      ))}
+                    </ul>
+                    <a class="enlace-flecha" href={`/tienda?categoria=${cat.slug}`}>Ver toda la categoría <Icono nombre="flecha" tamano={16} /></a>
+                  </div>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+      <a class="promo" href="/promociones" aria-current={seccionActual === 'promociones' ? 'page' : undefined}>{c.texto('global.menu.promociones')}</a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .encabezado { background: var(--blanco); position: relative; z-index: 30; }
+  .fila { display: flex; align-items: center; gap: 12px; min-height: 64px; }
+  @media (min-width: 1024px) { .fila { gap: 28px; min-height: 84px; } }
+
+  .logo { display: flex; align-items: center; text-decoration: none; flex: none; margin-right: auto; }
+  .logo :global(img) { max-height: 48px; width: auto; }
+  .logo-texto { display: flex; align-items: center; gap: 8px; color: var(--negro); }
+  .logo-texto :global(.logo-casa) { color: var(--rojo); stroke-width: 2.4; }
+  .logo-texto strong { display: block; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1; font-variation-settings: 'wdth' 110; }
+  .logo-texto small { display: block; font-size: 0.5625rem; letter-spacing: 0.32em; text-transform: uppercase; font-weight: 600; margin-top: 3px; }
+  @media (min-width: 1024px) { .logo { margin-right: 0; } .logo-texto strong { font-size: 1.875rem; } .logo-texto small { font-size: 0.625rem; } }
+
+  .buscador { display: none; position: relative; flex: 1; max-width: 620px; }
+  .buscador .entrada { background: var(--gris-fondo); border-color: transparent; padding-right: 64px; border-radius: 8px; }
+  .boton-buscar {
+    position: absolute; right: 0; top: 0; bottom: 0; width: 56px; border: 0; border-radius: 0 8px 8px 0;
+    background: var(--rojo); color: var(--blanco); cursor: pointer; display: grid; place-items: center;
+  }
+  .boton-buscar:hover { background: var(--rojo-oscuro); }
+  @media (min-width: 1024px) { .buscador { display: block; } }
+
+  .acciones { display: flex; align-items: center; gap: 4px; }
+  @media (min-width: 1024px) { .acciones { gap: 22px; margin-left: auto; } }
+  .accion { display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 0.875rem; font-weight: 600; padding: 8px; border-radius: 8px; }
+  .accion:hover { background: var(--gris-fondo); }
+  .accion > span:not(.con-contador):not(.solo-lectores) { display: none; }
+  @media (min-width: 1024px) { .accion > span:not(.con-contador):not(.solo-lectores) { display: inline; } }
+  .accion[href='/mi-pedido'] { display: none; }
+  @media (min-width: 1024px) { .accion[href='/mi-pedido'] { display: flex; } }
+  .con-contador { position: relative; display: inline-flex; }
+  .contador {
+    position: absolute; top: -7px; right: -9px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 99px;
+    background: var(--rojo); color: var(--blanco); font-size: 0.6875rem; font-weight: 800; display: grid; place-items: center;
+  }
+  .contador[hidden] { display: none; }
+  .wa { display: none; }
+  @media (min-width: 1024px) { .wa { display: inline-flex; } }
+  .icono-boton {
+    display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 8px; border: 0; background: none;
+    cursor: pointer; color: var(--tinta);
+  }
+  .icono-boton:hover { background: var(--gris-fondo); }
+  @media (min-width: 1024px) { .lupa { display: none; } }
+
+  /* Menú móvil: <details> funciona sin JavaScript; con JS se cierra con Esc y al tocar fuera. */
+  .menu-movil { order: -1; }
+  .menu-movil > summary { list-style: none; }
+  .menu-movil > summary::-webkit-details-marker { display: none; }
+  @media (min-width: 1024px) { .menu-movil { display: none; } }
+  .panel {
+    position: fixed; inset: 0 auto 0 0; width: min(86vw, 360px); background: var(--blanco); z-index: 50;
+    padding: 12px 16px 24px; overflow-y: auto; box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.45);
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .panel-cabecera { display: flex; align-items: center; justify-content: space-between; }
+  .panel-titulo { font-weight: 800; font-size: 1.125rem; }
+  .panel ul { list-style: none; margin: 0; padding: 0; }
+  .panel li a {
+    display: flex; justify-content: space-between; align-items: center; padding: 14px 4px; text-decoration: none;
+    font-weight: 600; border-bottom: 1px solid var(--gris-linea);
+  }
+  .panel li a[aria-current='page'] { color: var(--rojo); }
+  .panel .promo { color: var(--rojo); font-weight: 800; }
+  .panel .secundario a { font-weight: 500; color: var(--gris-texto); border: 0; padding: 10px 4px; }
+
+  /* Barra negra de categorías */
+  .barra-categorias { display: none; background: var(--negro); color: var(--blanco); }
+  @media (min-width: 1024px) { .barra-categorias { display: block; } }
+  .barra-categorias > .contenedor { display: flex; align-items: stretch; justify-content: space-between; gap: 8px; }
+  .barra-categorias ul { list-style: none; margin: 0; padding: 0; display: flex; }
+  .barra-categorias > .contenedor > ul { flex-wrap: nowrap; min-width: 0; }
+  .barra-categorias > .contenedor > ul > li { position: relative; }
+  .barra-categorias > .contenedor > ul > li > a {
+    display: flex; align-items: center; gap: 2px; padding: 14px 8px; text-decoration: none; font-size: 0.8125rem;
+    font-weight: 600; white-space: nowrap; border-bottom: 3px solid transparent;
+  }
+  @media (min-width: 1280px) { .barra-categorias > .contenedor > ul > li > a { padding-inline: 12px; font-size: 0.875rem; } }
+  .barra-categorias > .contenedor > ul > li > a:hover,
+  .barra-categorias a[aria-current='page'] { border-bottom-color: var(--rojo); }
+  .barra-categorias .promo {
+    display: flex; align-items: center; padding: 0 28px; background: var(--rojo); color: var(--blanco);
+    font-weight: 700; text-decoration: none; font-size: 0.9375rem;
+  }
+  .barra-categorias .promo:hover, .barra-categorias .promo[aria-current='page'] { background: var(--rojo-oscuro); }
+  .desplegable {
+    position: absolute; top: 100%; left: 0; min-width: 260px; background: var(--blanco); color: var(--tinta);
+    border-radius: 0 0 var(--radio) var(--radio); box-shadow: var(--sombra); padding: 18px 20px; display: grid; gap: 10px;
+    opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  }
+  .con-menu:hover .desplegable, .con-menu:focus-within .desplegable { opacity: 1; visibility: visible; transform: none; }
+  .desplegable p { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris-texto); }
+  .desplegable ul { display: grid; gap: 2px; }
+  .desplegable ul a { display: block; padding: 6px 0; text-decoration: none; font-weight: 600; }
+  .desplegable ul a:hover { color: var(--rojo); }
+</style>

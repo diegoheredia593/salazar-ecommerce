@@ -1,0 +1,9 @@
+[
+  { "idOrigen": "tarjeta-refrigeracion", "slug": "refrigeracion", "estado": "visible", "orden": 0, "datos": { "nombre": "Refrigeración", "categoria": "refrigeracion", "foto": null } },
+  { "idOrigen": "tarjeta-lavado-y-secado", "slug": "lavado-y-secado", "estado": "visible", "orden": 1, "datos": { "nombre": "Lavado y Secado", "categoria": "lavado-y-secado", "foto": null } },
+  { "idOrigen": "tarjeta-coccion", "slug": "coccion", "estado": "visible", "orden": 2, "datos": { "nombre": "Cocción", "categoria": "coccion", "foto": null } },
+  { "idOrigen": "tarjeta-microondas", "slug": "microondas", "estado": "visible", "orden": 3, "datos": { "nombre": "Microondas", "categoria": "microondas", "foto": null } },
+  { "idOrigen": "tarjeta-lavavajillas", "slug": "lavavajillas", "estado": "visible", "orden": 4, "datos": { "nombre": "Lavavajillas", "categoria": "lavavajillas", "foto": null } },
+  { "idOrigen": "tarjeta-climatizacion", "slug": "climatizacion", "estado": "visible", "orden": 5, "datos": { "nombre": "Climatización", "categoria": "climatizacion", "foto": null } },
+  { "idOrigen": "tarjeta-pequenos-electrodomesticos", "slug": "pequenos-electrodomesticos", "estado": "visible", "orden": 6, "datos": { "nombre": "Pequeños Electrodomésticos", "categoria": "pequenos-electrodomesticos", "foto": null } }
+]

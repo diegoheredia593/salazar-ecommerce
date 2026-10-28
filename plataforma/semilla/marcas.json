@@ -1,0 +1,398 @@
+[
+    {
+        "idOrigen":  "marca-black-decker",
+        "slug":  "black-decker",
+        "estado":  "visible",
+        "orden":  0,
+        "datos":  {
+                      "nombre":  "Black+Decker",
+                      "slug":  "black-decker",
+                      "nombreEnProductos":  "Black+Decker",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-blaupunkt",
+        "slug":  "blaupunkt",
+        "estado":  "visible",
+        "orden":  1,
+        "datos":  {
+                      "nombre":  "Blaupunkt",
+                      "slug":  "blaupunkt",
+                      "nombreEnProductos":  "Blaupunkt",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-continental",
+        "slug":  "continental",
+        "estado":  "visible",
+        "orden":  2,
+        "datos":  {
+                      "nombre":  "Continental",
+                      "slug":  "continental",
+                      "nombreEnProductos":  "Continental",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-echef",
+        "slug":  "echef",
+        "estado":  "visible",
+        "orden":  3,
+        "datos":  {
+                      "nombre":  "Echef",
+                      "slug":  "echef",
+                      "nombreEnProductos":  "Echef",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-ecoline",
+        "slug":  "ecoline",
+        "estado":  "visible",
+        "orden":  4,
+        "datos":  {
+                      "nombre":  "Ecoline",
+                      "slug":  "ecoline",
+                      "nombreEnProductos":  "Ecoline",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-electrolux",
+        "slug":  "electrolux",
+        "estado":  "visible",
+        "orden":  5,
+        "datos":  {
+                      "nombre":  "Electrolux",
+                      "slug":  "electrolux",
+                      "nombreEnProductos":  "Electrolux",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-hamilton-beach",
+        "slug":  "hamilton-beach",
+        "estado":  "visible",
+        "orden":  6,
+        "datos":  {
+                      "nombre":  "Hamilton Beach",
+                      "slug":  "hamilton-beach",
+                      "nombreEnProductos":  "Hamilton Beach",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-hisense",
+        "slug":  "hisense",
+        "estado":  "visible",
+        "orden":  7,
+        "datos":  {
+                      "nombre":  "Hisense",
+                      "slug":  "hisense",
+                      "nombreEnProductos":  "Hisense",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-indurama",
+        "slug":  "indurama",
+        "estado":  "visible",
+        "orden":  8,
+        "datos":  {
+                      "nombre":  "Indurama",
+                      "slug":  "indurama",
+                      "nombreEnProductos":  "Indurama",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-innova",
+        "slug":  "innova",
+        "estado":  "visible",
+        "orden":  9,
+        "datos":  {
+                      "nombre":  "Innova",
+                      "slug":  "innova",
+                      "nombreEnProductos":  "Innova",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-innovair",
+        "slug":  "innovair",
+        "estado":  "visible",
+        "orden":  10,
+        "datos":  {
+                      "nombre":  "Innovair",
+                      "slug":  "innovair",
+                      "nombreEnProductos":  "Innovair",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-lg",
+        "slug":  "lg",
+        "estado":  "visible",
+        "orden":  11,
+        "datos":  {
+                      "nombre":  "LG",
+                      "slug":  "lg",
+                      "nombreEnProductos":  "LG",
+                      "logo":  null,
+                      "frase":  "Innovación para tu hogar",
+                      "botonTexto":  "Ver productos",
+                      "fotoBanner":  null,
+                      "fondo":  "oscuro",
+                      "mostrarEnPortada":  true,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-mabe",
+        "slug":  "mabe",
+        "estado":  "visible",
+        "orden":  12,
+        "datos":  {
+                      "nombre":  "Mabe",
+                      "slug":  "mabe",
+                      "nombreEnProductos":  "Mabe",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-midea",
+        "slug":  "midea",
+        "estado":  "visible",
+        "orden":  13,
+        "datos":  {
+                      "nombre":  "Midea",
+                      "slug":  "midea",
+                      "nombreEnProductos":  "Midea",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-ninja",
+        "slug":  "ninja",
+        "estado":  "visible",
+        "orden":  14,
+        "datos":  {
+                      "nombre":  "Ninja",
+                      "slug":  "ninja",
+                      "nombreEnProductos":  "Ninja",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-oster",
+        "slug":  "oster",
+        "estado":  "visible",
+        "orden":  15,
+        "datos":  {
+                      "nombre":  "Oster",
+                      "slug":  "oster",
+                      "nombreEnProductos":  "Oster",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-rca",
+        "slug":  "rca",
+        "estado":  "visible",
+        "orden":  16,
+        "datos":  {
+                      "nombre":  "RCA",
+                      "slug":  "rca",
+                      "nombreEnProductos":  "RCA",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-samsung",
+        "slug":  "samsung",
+        "estado":  "visible",
+        "orden":  17,
+        "datos":  {
+                      "nombre":  "Samsung",
+                      "slug":  "samsung",
+                      "nombreEnProductos":  "Samsung",
+                      "logo":  null,
+                      "frase":  "Diseño, tecnología y eficiencia",
+                      "botonTexto":  "Ver productos",
+                      "fotoBanner":  null,
+                      "fondo":  "azul",
+                      "mostrarEnPortada":  true,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-smc",
+        "slug":  "smc",
+        "estado":  "visible",
+        "orden":  18,
+        "datos":  {
+                      "nombre":  "SMC",
+                      "slug":  "smc",
+                      "nombreEnProductos":  "SMC",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-tcl",
+        "slug":  "tcl",
+        "estado":  "visible",
+        "orden":  19,
+        "datos":  {
+                      "nombre":  "TCL",
+                      "slug":  "tcl",
+                      "nombreEnProductos":  "TCL",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-whirlpool",
+        "slug":  "whirlpool",
+        "estado":  "visible",
+        "orden":  20,
+        "datos":  {
+                      "nombre":  "Whirlpool",
+                      "slug":  "whirlpool",
+                      "nombreEnProductos":  "Whirlpool",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    },
+    {
+        "idOrigen":  "marca-zitro",
+        "slug":  "zitro",
+        "estado":  "visible",
+        "orden":  21,
+        "datos":  {
+                      "nombre":  "Zitro",
+                      "slug":  "zitro",
+                      "nombreEnProductos":  "Zitro",
+                      "logo":  null,
+                      "frase":  "",
+                      "botonTexto":  "",
+                      "fotoBanner":  null,
+                      "fondo":  "claro",
+                      "mostrarEnPortada":  false,
+                      "descripcion":  ""
+                  }
+    }
+]

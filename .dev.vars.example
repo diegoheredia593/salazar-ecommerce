@@ -1,0 +1,7 @@
+# Copia este archivo a .dev.vars (que no va al repo).
+# Sin llave: FUENTE=semilla lee plataforma/ y desarrollo/tienda-semilla.json (solo en astro dev).
+# Con llave: FUENTE=plataforma y PLATAFORMA_LLAVE con los alcances contenido:leer, formularios:enviar,
+# visitas:registrar, tienda:leer y tienda:carrito.
+FUENTE=semilla
+PLATAFORMA_LLAVE=
+TURNSTILE_SECRET=

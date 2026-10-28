@@ -1,0 +1,46 @@
+---
+import type { ElementoBeneficios } from '../lib/content/colecciones.generado';
+import Icono from './Icono.astro';
+
+interface Props { beneficios: ElementoBeneficios[]; variante: 'sellos' | 'franja' | 'ficha' }
+const { beneficios, variante } = Astro.props;
+---
+{
+  beneficios.length > 0 && (
+    <ul class:list={['beneficios', variante]}>
+      {beneficios.map((b) => (
+        <li>
+          <Icono nombre={b.icono} tamano={variante === 'franja' ? 36 : 28} />
+          <span>
+            <strong>{b.titulo}</strong>
+            {b.detalle && <small>{b.detalle}</small>}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .beneficios { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  li { display: flex; align-items: center; gap: 12px; }
+  strong { display: block; font-size: 0.875rem; font-weight: 700; }
+  small { display: block; font-size: 0.8125rem; color: var(--gris-texto); }
+
+  .sellos { grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .sellos { grid-template-columns: repeat(3, auto); justify-content: start; gap: 28px; } }
+
+  .franja { grid-template-columns: 1fr; gap: 0; }
+  .franja li { padding: 18px 4px; border-bottom: 1px solid var(--gris-linea); }
+  .franja :global(svg) { color: var(--rojo); flex: none; }
+  .franja strong { font-size: 1rem; }
+  @media (min-width: 640px) { .franja { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) {
+    .franja { grid-template-columns: repeat(4, 1fr); }
+    .franja li { border-bottom: 0; padding: 8px 24px; justify-content: center; }
+    .franja li + li { border-left: 1px solid var(--gris-linea); }
+  }
+
+  .ficha { gap: 14px; }
+  .ficha :global(svg) { color: var(--rojo); flex: none; }
+</style>

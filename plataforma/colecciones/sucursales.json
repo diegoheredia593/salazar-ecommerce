@@ -1,0 +1,19 @@
+{
+  "key": "sucursales",
+  "label": "Sucursales",
+  "singular": "sucursal",
+  "gender": "f",
+  "description": "Los locales de Salazar: se ven en el pie, en Contacto y en Nosotros.",
+  "titleField": "nombre",
+  "searchFields": ["nombre", "ciudad"],
+  "sortBy": "order",
+  "fields": [
+    { "name": "nombre", "label": "Nombre", "control": "text", "required": true, "max": 60 },
+    { "name": "direccion", "label": "Dirección", "control": "textLong", "required": true, "max": 200 },
+    { "name": "ciudad", "label": "Ciudad", "control": "text", "max": 40 },
+    { "name": "horario", "label": "Horario", "control": "text", "max": 100 },
+    { "name": "telefono", "label": "Teléfono", "control": "text", "max": 30 },
+    { "name": "mapa", "label": "Enlace de Google Maps", "control": "url" },
+    { "name": "foto", "label": "Foto del local", "control": "image", "aspectRatio": "4:3" }
+  ]
+}
