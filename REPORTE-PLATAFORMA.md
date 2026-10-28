@@ -164,4 +164,25 @@ otra «Sitio Salazar» con los mismos cinco alcances y cargarla solo con `wrangl
 
 ## Verificación de la Fase 4
 
-Pendiente.
+### Primer despliegue (28-oct-2026, en workers.dev)
+
+- Repo `diegoheredia593/salazar-ecommerce`, commit `d6669ab` en `main`. Desplegado con `wrangler deploy` desde ese
+  commit: Worker `salazar-home-web`, versión `7c8ecf68-1e0a-4d23-a0ac-3d7633f8d5b9`, en
+  `https://salazar-home-web.herediadiego963.workers.dev`. El repo todavía no está conectado a Workers Builds: un push
+  no despliega solo.
+- Bindings: `PLATAFORMA` → `agencia-plataforma` (confirmado en la cuenta), `ASSETS`, `TURNSTILE_SITE_KEY` vacía.
+  Secreto: `PLATAFORMA_LLAVE`.
+- **Tropiezo:** la primera carga del secreto con `… | wrangler secret put` en PowerShell 5.1 le antepuso un BOM
+  (`EF BB BF`) y todo dio 500 («Llave inválida o revocada»). Se cargó otra vez desde un archivo UTF-8 sin BOM con
+  `cmd /c "wrangler secret put … < archivo"`. No canalizar secretos con `|` en PowerShell 5.1.
+- Rutas: `/`, `/tienda`, `/marca/samsung`, `/contacto`, `/carrito` y `/sitemap.xml` responden 200; `/robots.txt` 200;
+  `/no-existe` 404. Las 6 fichas publicadas responden 200, y ninguna foto sale con el host `agencia-plataforma`.
+- Carrito real por `/api/carrito` y `/pagar?carrito=…` con 200: la página de la plataforma con la marca de Salazar
+  («La tienda no está recibiendo pedidos», porque faltan cobros y envíos). `/pagar` sin carrito da «Sitio no
+  encontrado» (404), igual que en local.
+- Capturas a 390 y 1440 px en `capturas/produccion/`: iguales a las de `astro dev`.
+- **Volver atrás:** `npx wrangler rollback` (a la versión anterior) o `npx wrangler versions list` y
+  `npx wrangler rollback <id>`.
+
+Falta: dominio propio, llave rotada, Turnstile (opcional), cobros y envíos, un pedido real para `/compra/<token>`,
+una prueba «PRUEBA» por formulario y medir que un cambio de texto aparezca en menos de 20 s.
